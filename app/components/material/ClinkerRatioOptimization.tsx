@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
+import { Card, CardContent } from "@/ui/card"
+import { Button } from "@/ui/button"
+import { Progress } from "@/ui/progress"
 import { ParameterInput } from './ParameterInput'
 import { OptimizationResults } from './OptimizationResults'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/ui/alert-dialog"
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import ErrorBoundary from '../common/ErrorBoundary'
 import { OptimizationResult } from '@/types/common'

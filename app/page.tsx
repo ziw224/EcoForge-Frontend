@@ -6,8 +6,8 @@ import {
   CardHeader,
   CardTitle,
   CardFooter,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+} from "@/ui/card";
+import { Button } from "@/ui/button";
 import Link from "next/link";
 import {
   BarChart2,
