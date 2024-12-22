@@ -1,4 +1,4 @@
-import { Layout } from './components/ui/layout'
+import { Layout } from './components/Layout/layout'
 import './globals.css'
 import { Inter, Montserrat } from 'next/font/google'
 
