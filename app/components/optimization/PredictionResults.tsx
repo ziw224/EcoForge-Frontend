@@ -27,14 +27,26 @@ const COLORS = {
   alkali: ["#8884d8", "#83a6ed", "#8dd1e1"],
 };
 
-export function PredictionResults({ results }) {
+interface PredictionResultsProps {
+  results: {
+    strength: Record<string, number>;
+    chemical: {
+      major: Record<string, number>;
+      minor: Record<string, number>;
+      alkali: Record<string, number>;
+      other: Record<string, number>;
+    };
+  };
+}
+
+export function PredictionResults({ results }: PredictionResultsProps) {
   const strengthData = [
     { name: "1天", 强度: results.strength["1d"] },
     { name: "3天", 强度: results.strength["3d"] },
     { name: "28天", 强度: results.strength["28d"] },
   ];
 
-  const preparePieData = (data) => {
+  const preparePieData = (data: Record<string, number>) => {
     return Object.entries(data).map(([name, value]) => ({
       name,
       value: Number(value),
@@ -51,7 +63,7 @@ export function PredictionResults({ results }) {
           <div className="grid grid-cols-3 gap-4 mb-6">
             {Object.entries(results.strength).map(([day, value]) => (
               <div key={day} className="text-center">
-                <div className="text-2xl font-bold">{value} MPa</div>
+                <div className="text-2xl font-bold">{value as number} MPa</div>
                 <div className="text-sm text-gray-600">{day}强度</div>
               </div>
             ))}
@@ -112,7 +124,7 @@ export function PredictionResults({ results }) {
                     ([name, value]) => (
                       <TableRow key={name}>
                         <TableCell>{name}</TableCell>
-                        <TableCell>{value}%</TableCell>
+                        <TableCell>{(value as number).toFixed(2)}%</TableCell>
                       </TableRow>
                     )
                   )}
@@ -120,7 +132,7 @@ export function PredictionResults({ results }) {
                     ([name, value]) => (
                       <TableRow key={name}>
                         <TableCell>{name}</TableCell>
-                        <TableCell>{value}%</TableCell>
+                        <TableCell>{(value as number).toFixed(2)}%</TableCell>
                       </TableRow>
                     )
                   )}
@@ -128,7 +140,7 @@ export function PredictionResults({ results }) {
                     ([name, value]) => (
                       <TableRow key={name}>
                         <TableCell>{name}</TableCell>
-                        <TableCell>{value}%</TableCell>
+                        <TableCell>{(value as number).toFixed(2)}%</TableCell>
                       </TableRow>
                     )
                   )}
@@ -136,7 +148,7 @@ export function PredictionResults({ results }) {
                     ([name, value]) => (
                       <TableRow key={name}>
                         <TableCell>{name}</TableCell>
-                        <TableCell>{value}%</TableCell>
+                        <TableCell>{(value as number).toFixed(2)}%</TableCell>
                       </TableRow>
                     )
                   )}

@@ -53,8 +53,21 @@ const chemicalParameters = [
   { id: "l-CL", name: "氯离子", unit: "l-CL" },
 ];
 
+type ParameterCategory = "basic" | "coal" | "clinker" | "chemical";
+
 export function ParameterInput() {
-  const [parameters, setParameters] = useState({
+  const [parameters, setParameters] = useState<{
+    basic: {
+      date: string;
+      batchNumber: string;
+      operator: string;
+      modelVersion: string;
+      storagePath: string;
+    };
+    coal: Record<string, string>;
+    clinker: Record<string, string>;
+    chemical: Record<string, string>;
+  }>({
     basic: {
       date: new Date().toISOString().split("T")[0],
       batchNumber: "",
@@ -68,7 +81,7 @@ export function ParameterInput() {
   });
 
   const handleParameterChange = (
-    category: string,
+    category: ParameterCategory,
     id: string,
     value: string
   ) => {
@@ -82,7 +95,7 @@ export function ParameterInput() {
   };
 
   const renderParameter = (
-    category: string,
+    category: "coal" | "clinker" | "chemical",
     { id, name, unit }: { id: string; name: string; unit: string }
   ) => (
     <div
@@ -94,7 +107,7 @@ export function ParameterInput() {
       </Label>
       <Input
         type="number"
-        value={parameters[category][id]}
+        value={parameters[category][id] || ""}
         onChange={(e) => handleParameterChange(category, id, e.target.value)}
         className="max-w-[120px]"
         placeholder="参数输入"
@@ -177,10 +190,6 @@ export function ParameterInput() {
           </CardHeader>
           <CardContent className="space-y-1">
             {coalParameters.map((param) => renderParameter("coal", param))}
-            <Button variant="ghost" className="w-full mt-4">
-              <Plus className="h-4 w-4 mr-2" />
-              添加参数
-            </Button>
           </CardContent>
         </Card>
 
@@ -192,10 +201,6 @@ export function ParameterInput() {
             {chemicalParameters.map((param) =>
               renderParameter("chemical", param)
             )}
-            <Button variant="ghost" className="w-full mt-4">
-              <Plus className="h-4 w-4 mr-2" />
-              添加参数
-            </Button>
           </CardContent>
         </Card>
       </div>
@@ -206,10 +211,6 @@ export function ParameterInput() {
         </CardHeader>
         <CardContent className="space-y-1">
           {clinkerParameters.map((param) => renderParameter("clinker", param))}
-          <Button variant="ghost" className="w-full mt-4">
-            <Plus className="h-4 w-4 mr-2" />
-            添加参数
-          </Button>
         </CardContent>
       </Card>
     </div>

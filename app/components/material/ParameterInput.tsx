@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import { Label } from "@/ui/label";
 import { Input } from "@/ui/input";
-import { Button } from "@/ui/button";
 import {
   Select,
   SelectContent,
@@ -12,17 +11,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/ui/select";
-import { Plus } from "lucide-react";
 import { Switch } from "@/ui/switch";
-import { Parameter } from "@/types/common";
 
-type Parameter = {
+type LocalParameter = {
   id: string;
   name: string;
   unit: string;
   visible: boolean;
   value?: string;
 };
+
+type ParameterCategory = "basic" | "coal" | "chemical" | "clinker";
 
 const modelVersions = [
   { id: "v1.0", name: "Version 1.0 - 基础版" },
@@ -32,7 +31,7 @@ const modelVersions = [
 
 const defaultStoragePath = "/data/predictions/cement-strength/";
 
-const coalParameters: Parameter[] = [
+const coalParameters: LocalParameter[] = [
   { id: "Wf", name: "内水", unit: "Wf", visible: true },
   { id: "Minh", name: "外水", unit: "Minh", visible: true },
   { id: "Aad", name: "灰分", unit: "Aad", visible: true },
@@ -43,7 +42,7 @@ const coalParameters: Parameter[] = [
   { id: "Qgr", name: "热功率", unit: "Qgr", visible: true },
 ];
 
-const clinkerParameters: Parameter[] = [
+const clinkerParameters: LocalParameter[] = [
   { id: "LOSS", name: "烧失量", unit: "LOSS", visible: true },
   { id: "SiO2", name: "二氧化硅", unit: "SiO2", visible: true },
   { id: "Al2O3", name: "三氧化二铝", unit: "Al2O3", visible: true },
@@ -57,7 +56,7 @@ const clinkerParameters: Parameter[] = [
   { id: "CL", name: "氯离子", unit: "CL", visible: true },
 ];
 
-const chemicalParameters: Parameter[] = [
+const chemicalParameters: LocalParameter[] = [
   { id: "l-LOSS", name: "烧失量", unit: "l-LOSS", visible: true },
   { id: "l-SiO2", name: "二氧化硅", unit: "l-SiO2", visible: true },
   { id: "l-Al2O3", name: "三氧化二铝", unit: "l-Al2O3", visible: true },
@@ -96,37 +95,47 @@ export function ParameterInput({
     chemical: chemicalParameters,
   });
 
-  const [editMode, setEditMode] = useState({
+  const [editMode, setEditMode] = useState<{
+    coal: boolean;
+    chemical: boolean;
+    clinker: boolean;
+  }>({
     coal: false,
     chemical: false,
     clinker: false,
   });
 
   const handleParameterChange = (
-    category: string,
+    category: ParameterCategory,
     id: string,
     value: string
   ) => {
     setParameters((prev) => ({
       ...prev,
-      [category]: prev[category].map((param) =>
-        param.id === id ? { ...param, value } : param
-      ),
+      [category]:
+        category === "basic"
+          ? { ...prev[category], [id]: value }
+          : (prev[category] as LocalParameter[]).map((param) =>
+              param.id === id ? { ...param, value } : param
+            ),
     }));
   };
 
-  const renderParameter = (category: string, param: Parameter) => (
+  const renderParameter = (
+    category: ParameterCategory,
+    param: LocalParameter
+  ) => (
     <div
       key={param.id}
       className="flex items-center space-x-2 py-2 border-b border-gray-100 last:border-0"
     >
-      {editMode[category] && (
+      {category !== "basic" && editMode[category as keyof typeof editMode] && (
         <Switch
           checked={param.visible}
           onCheckedChange={() =>
             setParameters((prev) => ({
               ...prev,
-              [category]: prev[category].map((p) =>
+              [category]: (prev[category] as LocalParameter[]).map((p) =>
                 p.id === param.id ? { ...p, visible: !p.visible } : p
               ),
             }))
@@ -134,14 +143,16 @@ export function ParameterInput({
           aria-label={`Toggle ${param.name}`}
         />
       )}
-      <Label className={`${editMode[category] ? "w-32" : "w-40"} text-sm`}>
+      <Label className="w-40 text-sm">
         {param.name} ({param.unit})
       </Label>
       {param.visible && (
         <Input
           type="number"
           value={
-            parameters[category].find((p) => p.id === param.id)?.value || ""
+            (parameters[category] as LocalParameter[]).find(
+              (p) => p.id === param.id
+            )?.value || ""
           }
           onChange={(e) =>
             handleParameterChange(category, param.id, e.target.value)
@@ -227,7 +238,9 @@ export function ParameterInput({
             <CardTitle>焦煤参数</CardTitle>
           </CardHeader>
           <CardContent className="space-y-1">
-            {parameters.coal.map((param) => renderParameter("coal", param))}
+            {(parameters.coal as LocalParameter[]).map((param) =>
+              renderParameter("coal", param)
+            )}
           </CardContent>
         </Card>
 
@@ -236,7 +249,7 @@ export function ParameterInput({
             <CardTitle>生料化学成分</CardTitle>
           </CardHeader>
           <CardContent className="space-y-1">
-            {parameters.chemical.map((param) =>
+            {(parameters.chemical as LocalParameter[]).map((param) =>
               renderParameter("chemical", param)
             )}
           </CardContent>
@@ -247,7 +260,7 @@ export function ParameterInput({
             <CardTitle>熟料率值</CardTitle>
           </CardHeader>
           <CardContent className="space-y-1">
-            {parameters.clinker.map((param) =>
+            {(parameters.clinker as LocalParameter[]).map((param) =>
               renderParameter("clinker", param)
             )}
           </CardContent>
