@@ -15,6 +15,7 @@ import {
   FlaskRoundIcon as Flask,
   ArrowRight,
 } from "lucide-react";
+import { useUser } from "./context/userContext";
 
 const features = [
   {
@@ -41,6 +42,8 @@ const features = [
 ];
 
 export default function Home() {
+  const { user } = useUser();
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-12">
@@ -52,33 +55,39 @@ export default function Home() {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6 mb-12">
-        {features.map((feature) => (
-          <Card
-            key={feature.title}
-            className="flex flex-col hover:shadow-lg transition-shadow bg-gray-800 border-gray-700"
-          >
-            <CardHeader>
-              <feature.icon className="w-8 h-8 text-blue-400 mb-2" />
-              <CardTitle className="text-gray-100">{feature.title}</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <p className="text-gray-400">{feature.description}</p>
-            </CardContent>
-            <CardFooter className="pt-4">
-              <Link href={feature.href} className="w-full">
-                <Button
-                  variant="outline"
-                  className="w-full bg-transparent border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-gray-900 transition-colors"
-                >
-                  {feature.buttonText}
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+      {user?.companyId ? (
+        <div className="grid md:grid-cols-3 gap-6 mb-12">
+          {features.map((feature) => (
+            <Card
+              key={feature.title}
+              className="flex flex-col hover:shadow-lg transition-shadow bg-gray-800 border-gray-700"
+            >
+              <CardHeader>
+                <feature.icon className="w-8 h-8 text-blue-400 mb-2" />
+                <CardTitle className="text-gray-100">{feature.title}</CardTitle>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <p className="text-gray-400">{feature.description}</p>
+              </CardContent>
+              <CardFooter className="pt-4">
+                <Link href={feature.href} className="w-full">
+                  <Button
+                    variant="outline"
+                    className="w-full bg-transparent border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-gray-900 transition-colors"
+                  >
+                    {feature.buttonText}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center text-gray-400">
+          <p>请先登录以访问功能。</p>
+        </div>
+      )}
     </div>
   );
 }

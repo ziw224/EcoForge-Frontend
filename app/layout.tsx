@@ -2,6 +2,7 @@ import "./globals.css";
 import { Inter, Montserrat } from "next/font/google";
 import { ReactNode } from "react";
 import { Navbar } from "./components/layout/Navbar";
+import { UserProvider } from "./context/userContext"; // Import the UserProvider
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const montserrat = Montserrat({
@@ -26,7 +27,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="zh" className={`${inter.variable} ${montserrat.variable}`}>
       <body>
-        <Layout>{children}</Layout>
+        {/* Wrap everything inside the UserProvider */}
+        <UserProvider>
+          <Layout>{children}</Layout>
+        </UserProvider>
       </body>
     </html>
   );
