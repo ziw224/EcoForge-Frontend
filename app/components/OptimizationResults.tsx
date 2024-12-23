@@ -101,7 +101,7 @@ export default function OptimizationResults() {
               <TableHeader>
                 <TableRow>
                   <TableHead>方案</TableHead>
-                  <TableHead>1天强度</TableHead>
+                  <TableHead>1天强度111</TableHead>
                   <TableHead>3天强度</TableHead>
                   <TableHead>28天强度</TableHead>
                   <TableHead>价格</TableHead>

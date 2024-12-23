@@ -3,10 +3,10 @@
 import { useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { StrengthPrediction } from "../components/material/StrengthPrediction";
-import { ClinkerRatioOptimization } from "../components/material/ClinkerRatioOptimization";
-import { RawMaterialOptimization } from "../components/material/RawMaterialOptimization";
-import { CementMixOptimization } from "../components/material/CementMixOptimization";
+import { StrengthPrediction } from "../components/material/StrengthPrediction/StrengthPrediction";
+import { ClinkerRatioOptimization } from "../components/material/ClinckerRatioOptimization/ClinkerRatioOptimization";
+import { RawMaterialOptimization } from "../components/material/RawMaterial/RawMaterialOptimization";
+import { CementMixOptimization } from "../components/material/CementMix/CementMixOptimization";
 import { StepNavigation } from "../components/material/StepNavigation";
 
 const initialSteps = [
@@ -98,7 +98,7 @@ export default function MaterialPage() {
                   <div
                     id="step-1"
                     ref={(el) => {
-                      sectionsRef.current[0] = el; // Assign ref without returning
+                      sectionsRef.current[0] = el; 
                     }}
                     data-step="1"
                     className="py-8"
