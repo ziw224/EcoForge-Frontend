@@ -597,6 +597,9 @@ body{
 .relative{
   position: relative;
 }
+.sticky{
+  position: sticky;
+}
 .inset-0{
   inset: 0px;
 }
@@ -617,6 +620,12 @@ body{
 }
 .top-\[50\%\]{
   top: 50%;
+}
+.top-4{
+  top: 1rem;
+}
+.top-8{
+  top: 2rem;
 }
 .z-10{
   z-index: 10;
@@ -1021,6 +1030,10 @@ body{
   --tw-border-opacity: 1;
   border-color: rgb(107 114 128 / var(--tw-border-opacity, 1));
 }
+.border-gray-600{
+  --tw-border-opacity: 1;
+  border-color: rgb(75 85 99 / var(--tw-border-opacity, 1));
+}
 .border-gray-700{
   --tw-border-opacity: 1;
   border-color: rgb(55 65 81 / var(--tw-border-opacity, 1));
@@ -1034,10 +1047,6 @@ body{
 }
 .border-transparent{
   border-color: transparent;
-}
-.border-gray-600{
-  --tw-border-opacity: 1;
-  border-color: rgb(75 85 99 / var(--tw-border-opacity, 1));
 }
 .bg-accent{
   background-color: hsl(var(--accent));

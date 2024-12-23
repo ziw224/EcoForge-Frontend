@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StrengthPrediction } from "../components/material/StrengthPrediction";
@@ -44,20 +44,24 @@ export default function MaterialPage() {
   const [currentSteps, setCurrentSteps] = useState(initialSteps);
   const [activeStep, setActiveStep] = useState(1);
 
-  const handleStepChange = (stepId: number) => {
-    setActiveStep(stepId);
+  // Array of refs for step sections
+  const sectionsRef = useRef<(HTMLDivElement | null)[]>([]);
+
+  const handleStepChange = (stepId: number, completed: boolean) => {
     setCurrentSteps((prev) =>
       prev.map((step) => ({
         ...step,
         current: step.id === stepId,
-        completed: step.id < stepId,
+        completed: completed ? step.completed || step.id <= stepId : false,
       }))
     );
-  };
+    setActiveStep(stepId);
 
-  const handleTabChange = (value: string) => {
-    setCurrentSteps(initialSteps);
-    setActiveStep(1);
+    // Scroll to the corresponding section
+    const section = sectionsRef.current[stepId - 1];
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
@@ -75,11 +79,7 @@ export default function MaterialPage() {
         <div className="flex-1 order-2 lg:order-1">
           <Card className="bg-gray-800 border-gray-700">
             <CardContent className="p-6">
-              <Tabs
-                defaultValue="strength"
-                className="space-y-6"
-                onValueChange={handleTabChange}
-              >
+              <Tabs defaultValue="strength" className="space-y-6">
                 <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 gap-4 bg-transparent p-1">
                   <TabsTrigger value="strength" className="tab-button">
                     熟料强度预测
@@ -95,16 +95,52 @@ export default function MaterialPage() {
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="strength">
-                  <StrengthPrediction onStepChange={handleStepChange} />
+                  <div
+                    id="step-1"
+                    ref={(el) => {
+                      sectionsRef.current[0] = el; // Assign ref without returning
+                    }}
+                    data-step="1"
+                    className="py-8"
+                  >
+                    <StrengthPrediction onStepChange={handleStepChange} />
+                  </div>
                 </TabsContent>
                 <TabsContent value="clinker-ratio">
-                  <ClinkerRatioOptimization onStepChange={handleStepChange} />
+                  <div
+                    id="step-2"
+                    ref={(el) => {
+                      sectionsRef.current[1] = el;
+                    }}
+                    data-step="2"
+                    className="py-8"
+                  >
+                    <ClinkerRatioOptimization onStepChange={handleStepChange} />
+                  </div>
                 </TabsContent>
                 <TabsContent value="raw-material">
-                  <RawMaterialOptimization />
+                  <div
+                    id="step-3"
+                    ref={(el) => {
+                      sectionsRef.current[2] = el;
+                    }}
+                    data-step="3"
+                    className="py-8"
+                  >
+                    <RawMaterialOptimization />
+                  </div>
                 </TabsContent>
                 <TabsContent value="cement-mix">
-                  <CementMixOptimization />
+                  <div
+                    id="step-4"
+                    ref={(el) => {
+                      sectionsRef.current[3] = el;
+                    }}
+                    data-step="4"
+                    className="py-8"
+                  >
+                    <CementMixOptimization />
+                  </div>
                 </TabsContent>
               </Tabs>
             </CardContent>
@@ -112,11 +148,13 @@ export default function MaterialPage() {
         </div>
 
         <div className="w-full lg:w-64 order-1 lg:order-2">
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-gray-800 border-gray-700 sticky top-8">
             <CardContent className="p-4">
               <StepNavigation
                 steps={currentSteps}
-                onStepClick={handleStepChange}
+                onStepClick={(stepId) =>
+                  handleStepChange(stepId, currentSteps[stepId - 1]?.completed)
+                }
               />
             </CardContent>
           </Card>

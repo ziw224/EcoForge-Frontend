@@ -1,3 +1,5 @@
+"use client";
+
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +18,7 @@ interface StepNavigationProps {
 
 export function StepNavigation({ steps, onStepClick }: StepNavigationProps) {
   return (
-    <nav className="space-y-2">
+    <nav className="sticky top-4 space-y-2">
       <h2 className="text-lg font-semibold mb-4 text-white">步骤导航</h2>
       {steps.map((step) => (
         <button
