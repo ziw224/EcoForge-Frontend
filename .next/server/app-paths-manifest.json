@@ -1,3 +1,6 @@
 {
-  "/material/page": "app/material/page.js"
+  "/material/page": "app/material/page.js",
+  "/reports/page": "app/reports/page.js",
+  "/page": "app/page.js",
+  "/database/page": "app/database/page.js"
 }

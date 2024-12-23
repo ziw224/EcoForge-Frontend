@@ -44,9 +44,17 @@ const coalParameters: Parameter[] = [
 ];
 
 const clinkerParameters: Parameter[] = [
-  { id: "KH", name: "石灰石饱和度", unit: "KH", visible: true },
-  { id: "N", name: "硅率", unit: "N", visible: true },
-  { id: "P", name: "铝率", unit: "P", visible: true },
+  { id: "LOSS", name: "烧失量", unit: "LOSS", visible: true },
+  { id: "SiO2", name: "二氧化硅", unit: "SiO2", visible: true },
+  { id: "Al2O3", name: "三氧化二铝", unit: "Al2O3", visible: true },
+  { id: "Fe2O3", name: "三氧化二铁", unit: "Fe2O3", visible: true },
+  { id: "CaO", name: "氧化钙", unit: "CaO", visible: true },
+  { id: "MgO", name: "氧化镁", unit: "MgO", visible: true },
+  { id: "SO3", name: "三氧化硫", unit: "SO3", visible: true },
+  { id: "Na2O", name: "氧化钠", unit: "Na2O", visible: true },
+  { id: "K2O", name: "氧化钾", unit: "K2O", visible: true },
+  { id: "R2O", name: "碱含量", unit: "R2O", visible: true },
+  { id: "CL", name: "氯离子", unit: "CL", visible: true },
 ];
 
 const chemicalParameters: Parameter[] = [
@@ -61,6 +69,9 @@ const chemicalParameters: Parameter[] = [
   { id: "l-K2O", name: "氧化钾", unit: "l-K2O", visible: true },
   { id: "l-R2O", name: "碱含量", unit: "l-R2O", visible: true },
   { id: "l-CL", name: "氯离子", unit: "l-CL", visible: true },
+  { id: "KH", name: "石灰石饱和度", unit: "KH", visible: true },
+  { id: "N", name: "硅率", unit: "N", visible: true },
+  { id: "P", name: "铝率", unit: "P", visible: true },
 ];
 
 interface ParameterInputProps {
@@ -104,15 +115,6 @@ export function ParameterInput({
     }));
   };
 
-  const toggleParameterVisibility = (category: string, id: string) => {
-    setParameters((prev) => ({
-      ...prev,
-      [category]: prev[category].map((param) =>
-        param.id === id ? { ...param, visible: !param.visible } : param
-      ),
-    }));
-  };
-
   const renderParameter = (category: string, param: Parameter) => (
     <div
       key={param.id}
@@ -121,7 +123,14 @@ export function ParameterInput({
       {editMode[category] && (
         <Switch
           checked={param.visible}
-          onCheckedChange={() => toggleParameterVisibility(category, param.id)}
+          onCheckedChange={() =>
+            setParameters((prev) => ({
+              ...prev,
+              [category]: prev[category].map((p) =>
+                p.id === param.id ? { ...p, visible: !p.visible } : p
+              ),
+            }))
+          }
           aria-label={`Toggle ${param.name}`}
         />
       )}
@@ -137,7 +146,7 @@ export function ParameterInput({
           onChange={(e) =>
             handleParameterChange(category, param.id, e.target.value)
           }
-          className="max-w-[120px] bg-gray-700 text-white border-gray-600"
+          className="max-w-[120px]"
           placeholder="参数输入"
         />
       )}
@@ -212,22 +221,13 @@ export function ParameterInput({
         </CardContent>
       </Card>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-3 gap-6">
         <Card>
           <CardHeader>
             <CardTitle>焦煤参数</CardTitle>
           </CardHeader>
           <CardContent className="space-y-1">
             {parameters.coal.map((param) => renderParameter("coal", param))}
-            <Button
-              variant="outline"
-              className="w-full mt-4 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
-              onClick={() => {
-                setEditMode((prev) => ({ ...prev, coal: !prev.coal }));
-              }}
-            >
-              {editMode.coal ? "保存" : "编辑参数"}
-            </Button>
           </CardContent>
         </Card>
 
@@ -239,20 +239,9 @@ export function ParameterInput({
             {parameters.chemical.map((param) =>
               renderParameter("chemical", param)
             )}
-            <Button
-              variant="outline"
-              className="w-full mt-4 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
-              onClick={() => {
-                setEditMode((prev) => ({ ...prev, chemical: !prev.chemical }));
-              }}
-            >
-              {editMode.chemical ? "保存" : "编辑参数"}
-            </Button>
           </CardContent>
         </Card>
-      </div>
 
-      {parameters.clinker.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>熟料率值</CardTitle>
@@ -261,18 +250,9 @@ export function ParameterInput({
             {parameters.clinker.map((param) =>
               renderParameter("clinker", param)
             )}
-            <Button
-              variant="outline"
-              className="w-full mt-4 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
-              onClick={() => {
-                setEditMode((prev) => ({ ...prev, clinker: !prev.clinker }));
-              }}
-            >
-              {editMode.clinker ? "保存" : "编辑参数"}
-            </Button>
           </CardContent>
         </Card>
-      )}
+      </div>
     </div>
   );
 }
