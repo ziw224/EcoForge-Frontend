@@ -32,11 +32,18 @@ const coalParameters = [
   { id: "JG", name: "热值", unit: "J/G" },
   { id: "Qgr", name: "热功率", unit: "Qgr" },
 ];
-
 const clinkerParameters = [
-  { id: "KH", name: "石灰石饱和度", unit: "KH" },
-  { id: "N", name: "硅率", unit: "N" },
-  { id: "P", name: "铝率", unit: "P" },
+  { id: "LOSS", name: "烧失量", unit: "LOSS", visible: true },
+  { id: "SiO2", name: "二氧化硅", unit: "SiO2", visible: true },
+  { id: "Al2O3", name: "三氧化二铝", unit: "Al2O3", visible: true },
+  { id: "Fe2O3", name: "三氧化二铁", unit: "Fe2O3", visible: true },
+  { id: "CaO", name: "氧化钙", unit: "CaO", visible: true },
+  { id: "MgO", name: "氧化镁", unit: "MgO", visible: true },
+  { id: "SO3", name: "三氧化硫", unit: "SO3", visible: true },
+  { id: "Na2O", name: "氧化钠", unit: "Na2O", visible: true },
+  { id: "K2O", name: "氧化钾", unit: "K2O", visible: true },
+  { id: "R2O", name: "碱含量", unit: "R2O", visible: true },
+  { id: "CL", name: "氯离子", unit: "CL", visible: true },
 ];
 
 const chemicalParameters = [
@@ -205,14 +212,14 @@ export function ParameterInput() {
         </Card>
       </div>
 
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>熟料率值</CardTitle>
         </CardHeader>
         <CardContent className="space-y-1">
           {clinkerParameters.map((param) => renderParameter("clinker", param))}
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 }

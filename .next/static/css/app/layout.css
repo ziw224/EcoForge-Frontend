@@ -1035,6 +1035,10 @@ body{
 .border-transparent{
   border-color: transparent;
 }
+.border-gray-600{
+  --tw-border-opacity: 1;
+  border-color: rgb(75 85 99 / var(--tw-border-opacity, 1));
+}
 .bg-accent{
   background-color: hsl(var(--accent));
 }
