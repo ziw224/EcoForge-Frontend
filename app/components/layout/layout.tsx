@@ -1,15 +1,10 @@
-import { ReactNode } from "react";
-import { Navbar } from "./Navbar";
+import { Navbar } from './Navbar'
 
-interface LayoutProps {
-  children: ReactNode;
-}
-
-export function Layout({ children }: LayoutProps) {
+export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+    <div className="min-h-screen bg-white">
       <Navbar />
-      <main className="container mx-auto px-4 py-8">{children}</main>
+      {children}
     </div>
-  );
+  )
 }

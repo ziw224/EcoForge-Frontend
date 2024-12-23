@@ -1,8 +1,8 @@
 // File: /Users/zihanwang/Desktop/EcoForge-Frontend/app/components/Layout/layout.tsx
-import * as entry from '../../../../../app/components/Layout/layout.js'
+import * as entry from '../../../../../app/components/layout/layout.jsx'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
-type TEntry = typeof import('../../../../../app/components/Layout/layout.js')
+type TEntry = typeof import('../../../../../app/components/layout/layout.jsx')
 
 // Check that the entry is a valid entry
 checkFields<Diff<{
