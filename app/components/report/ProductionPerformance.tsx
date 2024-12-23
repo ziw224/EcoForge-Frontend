@@ -1,15 +1,24 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 const data = [
-  { name: '1日', 传统工艺: 3000, 智能优化: 3200 },
-  { name: '2日', 传统工艺: 3100, 智能优化: 3300 },
-  { name: '3日', 传统工艺: 2900, 智能优化: 3250 },
-  { name: '4日', 传统工艺: 3200, 智能优化: 3400 },
-  { name: '5日', 传统工艺: 3150, 智能优化: 3350 },
-  { name: '6日', 传统工艺: 3050, 智能优化: 3300 },
-  { name: '7日', 传统工艺: 3100, 智能优化: 3450 },
-]
+  { name: "1日", 传统工艺: 3000, 智能优化: 3200 },
+  { name: "2日", 传统工艺: 3100, 智能优化: 3300 },
+  { name: "3日", 传统工艺: 2900, 智能优化: 3250 },
+  { name: "4日", 传统工艺: 3200, 智能优化: 3400 },
+  { name: "5日", 传统工艺: 3150, 智能优化: 3350 },
+  { name: "6日", 传统工艺: 3050, 智能优化: 3300 },
+  { name: "7日", 传统工艺: 3100, 智能优化: 3450 },
+];
 
 export function ProductionPerformance() {
   return (
@@ -31,6 +40,5 @@ export function ProductionPerformance() {
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
-

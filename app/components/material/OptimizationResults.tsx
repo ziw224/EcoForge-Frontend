@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -9,8 +9,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BarChart,
   Bar,
@@ -24,15 +24,15 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { ArrowUpIcon, ArrowDownIcon, MinusIcon } from "lucide-react";
-import { Switch } from "@/ui/switch";
-import { Label } from "@/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/ui/select";
+} from "@/components/ui/select";
 import { OptimizationResult } from "@/types/common";
 
 const COLORS = [

@@ -1,15 +1,21 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select"
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 const data = [
-  { name: 'Tank 1', value: 400 },
-  { name: 'Tank 2', value: 300 },
-  { name: 'Tank 3', value: 200 },
-  { name: 'Tank 4', value: 100 },
-]
+  { name: "Tank 1", value: 400 },
+  { name: "Tank 2", value: 300 },
+  { name: "Tank 3", value: 200 },
+  { name: "Tank 4", value: 100 },
+];
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 export function Savings() {
   return (
@@ -41,7 +47,10 @@ export function Savings() {
               dataKey="value"
             >
               {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
               ))}
             </Pie>
           </PieChart>
@@ -52,6 +61,5 @@ export function Savings() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-

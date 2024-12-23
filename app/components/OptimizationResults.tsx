@@ -1,5 +1,12 @@
-import { Card, CardContent } from "@/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table"
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   BarChart,
   Bar,
@@ -9,43 +16,49 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts'
+} from "recharts";
 
 const mockData = {
-  khValues: Array(5).fill(null).map((_, i) => ({
-    id: i + 1,
-    方案: `方案 ${i + 1}`,
-    KH值1: 0.989,
-    KH值2: 0.989,
-    KH值3: 0.989,
-    KH值4: 0.989,
-    价格: '+84%',
-  })),
-  strengthData: Array(5).fill(null).map((_, i) => ({
-    id: i + 1,
-    方案: `方案 ${i + 1}`,
-    '1天强度': 0.989,
-    '3天强度': 0.989,
-    '28天强度': 0.989,
-    价格: '+84%',
-  })),
-  chemicalData: Array(5).fill(null).map((_, i) => ({
-    id: i + 1,
-    方案: `方案 ${i + 1}`,
-    LOSS: 0.989,
-    Fe2O3: 0.989,
-    Al2O3: 0.989,
-    MgO: 0.989,
-    'f-CaO': 0.989,
-    价格: '+84%',
-  })),
+  khValues: Array(5)
+    .fill(null)
+    .map((_, i) => ({
+      id: i + 1,
+      方案: `方案 ${i + 1}`,
+      KH值1: 0.989,
+      KH值2: 0.989,
+      KH值3: 0.989,
+      KH值4: 0.989,
+      价格: "+84%",
+    })),
+  strengthData: Array(5)
+    .fill(null)
+    .map((_, i) => ({
+      id: i + 1,
+      方案: `方案 ${i + 1}`,
+      "1天强度": 0.989,
+      "3天强度": 0.989,
+      "28天强度": 0.989,
+      价格: "+84%",
+    })),
+  chemicalData: Array(5)
+    .fill(null)
+    .map((_, i) => ({
+      id: i + 1,
+      方案: `方案 ${i + 1}`,
+      LOSS: 0.989,
+      Fe2O3: 0.989,
+      Al2O3: 0.989,
+      MgO: 0.989,
+      "f-CaO": 0.989,
+      价格: "+84%",
+    })),
   comparisonData: [
-    { name: '方案1', 指标1: 1, 指标2: 2.5, 指标3: 1.3 },
-    { name: '方案2', 指标1: 1, 指标2: 2.5, 指标3: 1.3 },
-    { name: '方案3', 指标1: 1, 指标2: 2.5, 指标3: 1.3 },
-    { name: '方案4', 指标1: 1, 指标2: 2.5, 指标3: 1.3 },
+    { name: "方案1", 指标1: 1, 指标2: 2.5, 指标3: 1.3 },
+    { name: "方案2", 指标1: 1, 指标2: 2.5, 指标3: 1.3 },
+    { name: "方案3", 指标1: 1, 指标2: 2.5, 指标3: 1.3 },
+    { name: "方案4", 指标1: 1, 指标2: 2.5, 指标3: 1.3 },
   ],
-}
+};
 
 export default function OptimizationResults() {
   return (
@@ -98,9 +111,9 @@ export default function OptimizationResults() {
                 {mockData.strengthData.map((row) => (
                   <TableRow key={row.id}>
                     <TableCell>{row.方案}</TableCell>
-                    <TableCell>{row['1天强度']}</TableCell>
-                    <TableCell>{row['3天强度']}</TableCell>
-                    <TableCell>{row['28天强度']}</TableCell>
+                    <TableCell>{row["1天强度"]}</TableCell>
+                    <TableCell>{row["3天强度"]}</TableCell>
+                    <TableCell>{row["28天强度"]}</TableCell>
                     <TableCell className="text-green-600">{row.价格}</TableCell>
                   </TableRow>
                 ))}
@@ -133,7 +146,7 @@ export default function OptimizationResults() {
                   <TableCell>{row.Fe2O3}</TableCell>
                   <TableCell>{row.Al2O3}</TableCell>
                   <TableCell>{row.MgO}</TableCell>
-                  <TableCell>{row['f-CaO']}</TableCell>
+                  <TableCell>{row["f-CaO"]}</TableCell>
                   <TableCell className="text-green-600">{row.价格}</TableCell>
                 </TableRow>
               ))}
@@ -162,5 +175,5 @@ export default function OptimizationResults() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

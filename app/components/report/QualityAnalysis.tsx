@@ -1,11 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/ui/select";
+} from "@/components/ui/select";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 const data = [

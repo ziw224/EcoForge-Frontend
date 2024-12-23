@@ -4,13 +4,13 @@ import { useState } from "react";
 import { MetricCards } from "../components/report/MetricCards";
 import { ProductionPerformance } from "../components/report/ProductionPerformance";
 import { QualityAnalysis } from "../components/report/QualityAnalysis";
-import { Button } from "@/ui/button";
-import { Calendar } from "@/ui/calendar";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/ui/popover";
+} from "@/components/ui/popover";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 

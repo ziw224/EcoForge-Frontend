@@ -1,15 +1,24 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 const data = [
-  { name: 'Jan', Traditional: 30000, PrecisionCIP: 25000 },
-  { name: 'Feb', Traditional: 35000, PrecisionCIP: 29000 },
-  { name: 'Mar', Traditional: 33000, PrecisionCIP: 31000 },
-  { name: 'Apr', Traditional: 38000, PrecisionCIP: 35000 },
-  { name: 'May', Traditional: 40000, PrecisionCIP: 38000 },
-  { name: 'Jun', Traditional: 45000, PrecisionCIP: 42000 },
-  { name: 'Jul', Traditional: 48000, PrecisionCIP: 45000 },
-]
+  { name: "Jan", Traditional: 30000, PrecisionCIP: 25000 },
+  { name: "Feb", Traditional: 35000, PrecisionCIP: 29000 },
+  { name: "Mar", Traditional: 33000, PrecisionCIP: 31000 },
+  { name: "Apr", Traditional: 38000, PrecisionCIP: 35000 },
+  { name: "May", Traditional: 40000, PrecisionCIP: 38000 },
+  { name: "Jun", Traditional: 45000, PrecisionCIP: 42000 },
+  { name: "Jul", Traditional: 48000, PrecisionCIP: 45000 },
+];
 
 export function PerformanceTracker() {
   return (
@@ -31,6 +40,5 @@ export function PerformanceTracker() {
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
-

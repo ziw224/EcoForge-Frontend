@@ -1,17 +1,17 @@
-import { Check } from 'lucide-react'
-import { cn } from "@/lib/utils"
+import { Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Step {
-  id: number
-  title: string
-  subtitle: string
-  completed: boolean
-  current: boolean
+  id: number;
+  title: string;
+  subtitle: string;
+  completed: boolean;
+  current: boolean;
 }
 
 interface StepNavigationProps {
-  steps: Step[]
-  onStepClick: (stepId: number) => void
+  steps: Step[];
+  onStepClick: (stepId: number) => void;
 }
 
 export function StepNavigation({ steps, onStepClick }: StepNavigationProps) {
@@ -56,6 +56,5 @@ export function StepNavigation({ steps, onStepClick }: StepNavigationProps) {
         </button>
       ))}
     </nav>
-  )
+  );
 }
-
