@@ -5,13 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
+type LocalParameter = {
+  id: string;
+  name: string;
+  unit: string;
+  visible: boolean;
+  value?: string;
+};
+
+type ParameterCategory = "basic" | "coal" | "chemical";
 
 const modelVersions = [
   { id: "v1.0", name: "Version 1.0 - 基础版" },
@@ -21,45 +24,37 @@ const modelVersions = [
 
 const defaultStoragePath = "/data/predictions/cement-strength/";
 
-const coalParameters = [
-  { id: "Wf", name: "内水", unit: "Wf" },
-  { id: "Minh", name: "外水", unit: "Minh" },
-  { id: "Aad", name: "灰分", unit: "Aad" },
-  { id: "FC", name: "固定碳", unit: "FC" },
-  { id: "S", name: "硫含量", unit: "S" },
-  { id: "GAR", name: "煤粉细度", unit: "GAR" },
-  { id: "JG", name: "热值", unit: "J/G" },
-  { id: "Qgr", name: "热功率", unit: "Qgr" },
+const coalParameters: LocalParameter[] = [
+  { id: "Wf", name: "内水", unit: "Wf", visible: true },
+  { id: "Minh", name: "外水", unit: "Minh", visible: true },
+  { id: "Aad", name: "灰分", unit: "Aad", visible: true },
+  { id: "FC", name: "固定碳", unit: "FC", visible: true },
+  { id: "S", name: "硫含量", unit: "S", visible: true },
+  { id: "GAR", name: "煤粉细度", unit: "GAR", visible: true },
+  { id: "JG", name: "热值", unit: "J/G", visible: true },
+  { id: "Qgr", name: "热功率", unit: "Qgr", visible: true },
 ];
 
-const chemicalParameters = [
-  { id: "l-LOSS", name: "烧失量", unit: "l-LOSS" },
-  { id: "l-SiO2", name: "二氧化硅", unit: "l-SiO2" },
-  { id: "l-Al2O3", name: "三氧化二铝", unit: "l-Al2O3" },
-  { id: "l-Fe2O3", name: "三氧化二铁", unit: "l-Fe2O3" },
-  { id: "l-CaO", name: "氧化钙", unit: "l-CaO" },
-  { id: "l-MgO", name: "氧化镁", unit: "l-MgO" },
-  { id: "l-SO3", name: "三氧化硫", unit: "l-SO3" },
-  { id: "l-Na2O", name: "氧化钠", unit: "l-Na2O" },
-  { id: "l-K2O", name: "氧化钾", unit: "l-K2O" },
-  { id: "l-R2O", name: "碱含量", unit: "l-R2O" },
-  { id: "l-CL", name: "氯离子", unit: "l-CL" },
+const chemicalParameters: LocalParameter[] = [
+  { id: "l-LOSS", name: "烧失量", unit: "l-LOSS", visible: true },
+  { id: "l-SiO2", name: "二氧化硅", unit: "l-SiO2", visible: true },
+  { id: "l-Al2O3", name: "三氧化二铝", unit: "l-Al2O3", visible: true },
+  { id: "l-Fe2O3", name: "三氧化二铁", unit: "l-Fe2O3", visible: true },
+  { id: "l-CaO", name: "氧化钙", unit: "l-CaO", visible: true },
+  { id: "l-MgO", name: "氧化镁", unit: "l-MgO", visible: true },
+  { id: "l-SO3", name: "三氧化硫", unit: "l-SO3", visible: true },
+  { id: "l-Na2O", name: "氧化钠", unit: "l-Na2O", visible: true },
+  { id: "l-K2O", name: "氧化钾", unit: "l-K2O", visible: true },
+  { id: "l-R2O", name: "碱含量", unit: "l-R2O", visible: true },
+  { id: "l-CL", name: "氯离子", unit: "l-CL", visible: true },
 ];
 
-type ParameterCategory = "basic" | "coal" | "chemical";
+interface ParameterInputProps {
+  onOptimizeStart: () => void; // Callback to trigger optimization in parent
+}
 
-export function ParameterInput() {
-  const [parameters, setParameters] = useState<{
-    basic: {
-      date: string;
-      batchNumber: string;
-      operator: string;
-      modelVersion: string;
-      storagePath: string;
-    };
-    coal: Record<string, string>;
-    chemical: Record<string, string>;
-  }>({
+export function ParameterInput({ onOptimizeStart }: ParameterInputProps) {
+  const [parameters, setParameters] = useState({
     basic: {
       date: new Date().toISOString().split("T")[0],
       batchNumber: "",
@@ -67,39 +62,36 @@ export function ParameterInput() {
       modelVersion: "v2.0",
       storagePath: defaultStoragePath,
     },
-    coal: Object.fromEntries(coalParameters.map((p) => [p.id, ""])),
-    chemical: Object.fromEntries(chemicalParameters.map((p) => [p.id, ""])),
+    coal: coalParameters,
+    chemical: chemicalParameters,
   });
 
-  const handleParameterChange = (
-    category: ParameterCategory,
-    id: string,
-    value: string
-  ) => {
-    setParameters((prev) => ({
-      ...prev,
-      [category]: {
-        ...prev[category],
-        [id]: value,
-      },
-    }));
-  };
-
   const renderParameter = (
-    category: "coal" | "chemical",
-    { id, name, unit }: { id: string; name: string; unit: string }
+    category: ParameterCategory,
+    param: LocalParameter
   ) => (
     <div
-      key={id}
+      key={param.id}
       className="flex items-center space-x-2 py-2 border-b border-gray-100 last:border-0"
     >
-      <Label className="w-32 text-sm">
-        {name} ({unit})
+      <Label className="w-40 text-sm">
+        {param.name} ({param.unit})
       </Label>
       <Input
         type="number"
-        value={parameters[category][id] || ""}
-        onChange={(e) => handleParameterChange(category, id, e.target.value)}
+        value={
+          (parameters[category] as LocalParameter[]).find(
+            (p) => p.id === param.id
+          )?.value || ""
+        }
+        onChange={(e) =>
+          setParameters((prev) => ({
+            ...prev,
+            [category]: (prev[category] as LocalParameter[]).map((p) =>
+              p.id === param.id ? { ...p, value: e.target.value } : p
+            ),
+          }))
+        }
         className="max-w-[120px]"
         placeholder="参数输入"
       />
@@ -120,7 +112,10 @@ export function ParameterInput() {
                 type="date"
                 value={parameters.basic.date}
                 onChange={(e) =>
-                  handleParameterChange("basic", "date", e.target.value)
+                  setParameters((prev) => ({
+                    ...prev,
+                    basic: { ...prev.basic, date: e.target.value },
+                  }))
                 }
               />
             </div>
@@ -129,7 +124,10 @@ export function ParameterInput() {
               <Input
                 value={parameters.basic.batchNumber}
                 onChange={(e) =>
-                  handleParameterChange("basic", "batchNumber", e.target.value)
+                  setParameters((prev) => ({
+                    ...prev,
+                    basic: { ...prev.basic, batchNumber: e.target.value },
+                  }))
                 }
               />
             </div>
@@ -138,38 +136,13 @@ export function ParameterInput() {
               <Input
                 value={parameters.basic.operator}
                 onChange={(e) =>
-                  handleParameterChange("basic", "operator", e.target.value)
+                  setParameters((prev) => ({
+                    ...prev,
+                    basic: { ...prev.basic, operator: e.target.value },
+                  }))
                 }
               />
             </div>
-            <div>
-              <Label>模型版本</Label>
-              <Select
-                value={parameters.basic.modelVersion}
-                onValueChange={(value) =>
-                  handleParameterChange("basic", "modelVersion", value)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="选择模型版本" />
-                </SelectTrigger>
-                <SelectContent>
-                  {modelVersions.map((version) => (
-                    <SelectItem key={version.id} value={version.id}>
-                      {version.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div>
-            <Label>储存地址</Label>
-            <Input
-              value={parameters.basic.storagePath}
-              disabled
-              className="bg-gray-50"
-            />
           </div>
         </CardContent>
       </Card>
@@ -180,7 +153,7 @@ export function ParameterInput() {
             <CardTitle>焦煤参数</CardTitle>
           </CardHeader>
           <CardContent className="space-y-1">
-            {coalParameters.map((param) => renderParameter("coal", param))}
+            {parameters.coal.map((param) => renderParameter("coal", param))}
           </CardContent>
         </Card>
 
@@ -189,12 +162,20 @@ export function ParameterInput() {
             <CardTitle>生料化学成分</CardTitle>
           </CardHeader>
           <CardContent className="space-y-1">
-            {chemicalParameters.map((param) =>
+            {parameters.chemical.map((param) =>
               renderParameter("chemical", param)
             )}
           </CardContent>
         </Card>
       </div>
+
+      <Button
+        onClick={onOptimizeStart} // Notify parent when clicked
+        size="lg"
+        className="bg-blue-500 w-full"
+      >
+        开始优化
+      </Button>
     </div>
   );
 }

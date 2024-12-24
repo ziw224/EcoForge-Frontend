@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StrengthPrediction } from "../components/material/StrengthPrediction/StrengthPrediction";
@@ -44,24 +44,20 @@ export default function MaterialPage() {
   const [currentSteps, setCurrentSteps] = useState(initialSteps);
   const [activeStep, setActiveStep] = useState(1);
 
-  // Array of refs for step sections
-  const sectionsRef = useRef<(HTMLDivElement | null)[]>([]);
-
-  const handleStepChange = (stepId: number, completed: boolean) => {
+  const handleStepChange = (stepId: number) => {
+    setActiveStep(stepId);
     setCurrentSteps((prev) =>
       prev.map((step) => ({
         ...step,
         current: step.id === stepId,
-        completed: completed ? step.completed || step.id <= stepId : false,
+        completed: step.id < stepId,
       }))
     );
-    setActiveStep(stepId);
+  };
 
-    // Scroll to the corresponding section
-    const section = sectionsRef.current[stepId - 1];
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" });
-    }
+  const handleTabChange = (value: string) => {
+    setCurrentSteps(initialSteps);
+    setActiveStep(1);
   };
 
   return (
@@ -76,10 +72,15 @@ export default function MaterialPage() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
+        {/* Main content */}
         <div className="flex-1 order-2 lg:order-1">
           <Card className="bg-gray-800 border-gray-700">
             <CardContent className="p-6">
-              <Tabs defaultValue="strength" className="space-y-6">
+              <Tabs
+                defaultValue="strength"
+                className="space-y-6"
+                onValueChange={handleTabChange}
+              >
                 <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 gap-4 bg-transparent p-1">
                   <TabsTrigger value="strength" className="tab-button">
                     熟料强度预测
@@ -95,69 +96,34 @@ export default function MaterialPage() {
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="strength">
-                  <div
-                    id="step-1"
-                    ref={(el) => {
-                      sectionsRef.current[0] = el; 
-                    }}
-                    data-step="1"
-                    className="py-8"
-                  >
-                    <StrengthPrediction onStepChange={handleStepChange} />
-                  </div>
+                  <StrengthPrediction onStepChange={handleStepChange} />
                 </TabsContent>
                 <TabsContent value="clinker-ratio">
-                  <div
-                    id="step-2"
-                    ref={(el) => {
-                      sectionsRef.current[1] = el;
-                    }}
-                    data-step="2"
-                    className="py-8"
-                  >
-                    <ClinkerRatioOptimization onStepChange={handleStepChange} />
-                  </div>
+                  <ClinkerRatioOptimization onStepChange={handleStepChange} />
                 </TabsContent>
                 <TabsContent value="raw-material">
-                  <div
-                    id="step-3"
-                    ref={(el) => {
-                      sectionsRef.current[2] = el;
-                    }}
-                    data-step="3"
-                    className="py-8"
-                  >
-                    <RawMaterialOptimization />
-                  </div>
+                  <RawMaterialOptimization />
                 </TabsContent>
                 <TabsContent value="cement-mix">
-                  <div
-                    id="step-4"
-                    ref={(el) => {
-                      sectionsRef.current[3] = el;
-                    }}
-                    data-step="4"
-                    className="py-8"
-                  >
-                    <CementMixOptimization />
-                  </div>
+                  <CementMixOptimization />
                 </TabsContent>
               </Tabs>
             </CardContent>
           </Card>
         </div>
 
+        {/* Sticky navigation */}
         <div className="w-full lg:w-64 order-1 lg:order-2">
-          <Card className="bg-gray-800 border-gray-700 sticky top-8">
-            <CardContent className="p-4">
-              <StepNavigation
-                steps={currentSteps}
-                onStepClick={(stepId) =>
-                  handleStepChange(stepId, currentSteps[stepId - 1]?.completed)
-                }
-              />
-            </CardContent>
-          </Card>
+          <div className="sticky top-4">
+            <Card className="bg-gray-800 border-gray-700">
+              <CardContent className="p-4">
+                <StepNavigation
+                  steps={currentSteps}
+                  onStepClick={handleStepChange}
+                />
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

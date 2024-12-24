@@ -16,6 +16,10 @@ import {
   Bar,
   LineChart,
   Line,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -33,6 +37,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Radar } from "recharts";
 import { OptimizationResult } from "@/types/common";
 
 const COLORS = [
@@ -48,30 +53,31 @@ const COLORS = [
   "#d0ed57",
 ];
 
-type ComparisonGroup =
-  | "ratios"
-  | "strength"
-  | "majorChemical"
-  | "minorChemical";
-
-const GROUPS: Record<ComparisonGroup, (keyof OptimizationResult)[]> = {
-  ratios: ["KH", "N", "P"],
-  strength: [],
-  majorChemical: [],
-  minorChemical: [],
-};
-
 interface OptimizationResultsProps {
   results: OptimizationResult[];
 }
+
+type ComparisonRow = {
+  name: string;
+  原始值1: number;
+  原始值2: number;
+  原始值3: number;
+};
 
 export function OptimizationResults({ results }: OptimizationResultsProps) {
   const [selectedResult, setSelectedResult] = useState(results[0]);
   const [previousResult, setPreviousResult] =
     useState<OptimizationResult | null>(null);
   const [useLogScale, setUseLogScale] = useState(false);
+  const groups = {
+    ratios: ["KH", "N", "P"],
+    strength: ["1d", "3d", "28d"],
+    majorChemical: ["SiO₂", "Al₂O₃", "Fe₂O₃", "CaO", "MgO"],
+    minorChemical: ["SO₃", "f-CaO", "Na₂O", "K₂O", "Cl⁻"],
+  };
+
   const [comparisonGroup, setComparisonGroup] =
-    useState<ComparisonGroup>("ratios");
+    useState<keyof typeof groups>("ratios");
   const [amplifyDifferences, setAmplifyDifferences] = useState(false);
 
   const handleTabChange = (value: string) => {
@@ -80,9 +86,6 @@ export function OptimizationResults({ results }: OptimizationResultsProps) {
     setPreviousResult(selectedResult);
     setSelectedResult(newResult);
   };
-
-  const isValidKey = (key: string): key is keyof OptimizationResult =>
-    key in selectedResult;
 
   const compareValues = (current: number, previous: number | undefined) => {
     if (previous === undefined) return null;
@@ -104,7 +107,18 @@ export function OptimizationResults({ results }: OptimizationResultsProps) {
     return diff;
   }, [selectedResult, previousResult]);
 
-  const prepareStrengthData = (strength: OptimizationResult["strength"]) => {
+  const prepareChartData = (chemical: Record<string, number>) => {
+    return Object.entries(chemical).map(([name, value]) => ({
+      name,
+      value: useLogScale ? Math.log10(value + 0.01) : value, // 添加0.01以避免log(0)
+    }));
+  };
+
+  const prepareStrengthData = (strength: {
+    "1d": number;
+    "3d": number;
+    "28d": number;
+  }) => {
     return [
       { name: "1天", 强度: strength["1d"] },
       { name: "3天", 强度: strength["3d"] },
@@ -112,23 +126,50 @@ export function OptimizationResults({ results }: OptimizationResultsProps) {
     ];
   };
 
-  const prepareComparisonData = () => {
-    const keys = GROUPS[comparisonGroup];
-    return keys.map((key) => {
-      const values = results.map((result) => result[key] || 0);
-      return {
-        name: key as string,
-        方案1: values[0],
-        方案2: values[1],
-        方案3: values[2],
-      };
-    });
+  const normalizeData = (data: number[]) => {
+    const min = Math.min(...data);
+    const max = Math.max(...data);
+    return data.map((value) => (value - min) / (max - min));
   };
 
-  const handleComparisonGroupChange = (value: string) => {
-    if (value in GROUPS) {
-      setComparisonGroup(value as ComparisonGroup);
-    }
+  const prepareComparisonData = (): ComparisonRow[] => {
+    const groups = {
+      ratios: ["KH", "N", "P"],
+      strength: ["1d", "3d", "28d"],
+      majorChemical: ["SiO₂", "Al₂O₃", "Fe₂O₃", "CaO", "MgO"],
+      minorChemical: ["SO₃", "f-CaO", "Na₂O", "K₂O", "Cl⁻"],
+    };
+
+    const data = groups[comparisonGroup as keyof typeof groups].map((key) => {
+      const values = results.map((result) => {
+        if (["KH", "N", "P"].includes(key)) {
+          // Handle KH, N, P directly
+          return result[key as "KH" | "N" | "P"];
+        } else if (["1d", "3d", "28d"].includes(key)) {
+          // Handle strength keys
+          return result.strength[key as keyof OptimizationResult["strength"]];
+        } else {
+          // Handle chemical composition keys
+          return result.chemical[key] || 0;
+        }
+      });
+
+      const normalizedValues = amplifyDifferences
+        ? normalizeData(values)
+        : values;
+
+      return {
+        name: key,
+        方案1: normalizedValues[0],
+        方案2: normalizedValues[1],
+        方案3: normalizedValues[2],
+        原始值1: values[0],
+        原始值2: values[1],
+        原始值3: values[2],
+      };
+    });
+
+    return data;
   };
 
   return (
@@ -152,28 +193,169 @@ export function OptimizationResults({ results }: OptimizationResultsProps) {
             {results.map((result) => (
               <TabsContent key={result.id} value={result.id.toString()}>
                 <div className="grid grid-cols-3 gap-4 mb-6">
-                  {GROUPS[comparisonGroup].map(
-                    (key) =>
-                      isValidKey(key) && (
-                        <div
-                          key={key}
-                          className="text-center p-4 bg-gray-700 rounded-lg"
-                        >
-                          <div className="text-2xl font-bold text-white">
-                            {typeof result[key] === "number"
-                              ? result[key].toFixed(2)
-                              : "N/A"}
-                            {typeof result[key] === "number" &&
-                              compareValues(
-                                result[key],
-                                previousResult?.[key] as number
-                              )}
-                          </div>
-                          <div className="text-sm text-gray-300">{key}值</div>
-                        </div>
-                      )
-                  )}
+                  {["KH", "N", "P"].map((key) => (
+                    <div
+                      key={key}
+                      className="text-center p-4 bg-gray-700 rounded-lg"
+                    >
+                      <div className="text-2xl font-bold text-white">
+                        {result[key as "KH" | "N" | "P"].toFixed(2)}
+                        {compareValues(
+                          result[key as "KH" | "N" | "P"],
+                          previousResult?.[key as "KH" | "N" | "P"]
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-300">{key}值</div>
+                    </div>
+                  ))}
                 </div>
+                <div className="grid grid-cols-3 gap-4 mb-6">
+                  {["1d", "3d", "28d"].map((day) => (
+                    <div
+                      key={day}
+                      className="text-center p-4 bg-gray-700 rounded-lg"
+                    >
+                      <div className="text-2xl font-bold text-white">
+                        {result.strength[day as "1d" | "3d" | "28d"].toFixed(1)}{" "}
+                        MPa
+                        {compareValues(
+                          result.strength[day as "1d" | "3d" | "28d"],
+                          previousResult?.strength[day as "1d" | "3d" | "28d"]
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-300">
+                        {day.replace("d", "天")}强度
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Card className="mt-6">
+                  <CardHeader>
+                    <CardTitle>方案 {result.id} 强度变化</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={prepareStrengthData(result.strength)}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Line
+                          type="monotone"
+                          dataKey="强度"
+                          stroke="#8884d8"
+                          activeDot={{ r: 8 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+                <Card className="mt-6">
+                  <CardHeader>
+                    <CardTitle>方案 {result.id} 化学成分分析</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="mb-4 text-sm text-gray-600">
+                      该方案的主要特点是 {result.KH > 0.92 ? "较高" : "较低"} 的
+                      KH 值（{result.KH.toFixed(2)}），
+                      {result.N > 2.35 ? "较高" : "较低"} 的硅率（
+                      {result.N.toFixed(2)}）， 以及{" "}
+                      {result.P > 1.45 ? "较高" : "较低"} 的铝率（
+                      {result.P.toFixed(2)}）。 这可能导致{" "}
+                      {result.strength["28d"] > 58 ? "较高" : "较低"}{" "}
+                      的28天强度（{result.strength["28d"].toFixed(1)} MPa）。
+                    </p>
+                    <div className="flex justify-end items-center space-x-2 mb-4">
+                      <Switch
+                        id={`log-scale-${result.id}`}
+                        checked={useLogScale}
+                        onCheckedChange={setUseLogScale}
+                      />
+                      <Label htmlFor={`log-scale-${result.id}`}>
+                        使用对数刻度
+                      </Label>
+                    </div>
+                    <div className="grid grid-cols-2 gap-6">
+                      <div>
+                        <ResponsiveContainer width="100%" height={400}>
+                          <BarChart
+                            data={prepareChartData(result.chemical)}
+                            layout="vertical"
+                            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis
+                              type="number"
+                              domain={useLogScale ? [-2, 2] : [0, "dataMax"]}
+                              tickFormatter={(value) =>
+                                useLogScale
+                                  ? `10^${value.toFixed(0)}`
+                                  : value.toFixed(1)
+                              }
+                            />
+                            <YAxis dataKey="name" type="category" width={60} />
+                            <Tooltip
+                              formatter={(value, name, props) => {
+                                const originalValue =
+                                  result.chemical[props.payload.name];
+                                return [
+                                  `${originalValue.toFixed(3)}%`,
+                                  props.payload.name,
+                                ];
+                              }}
+                            />
+                            <Legend />
+                            <Bar dataKey="value" fill="#8884d8" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>成分</TableHead>
+                              <TableHead className="text-right">
+                                含量 (%)
+                              </TableHead>
+                              <TableHead className="text-right">变化</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {Object.entries(result.chemical).map(
+                              ([name, value]) => (
+                                <TableRow key={name}>
+                                  <TableCell>{name}</TableCell>
+                                  <TableCell className="text-right">
+                                    {value.toFixed(3)}%
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    {chemicalDifference[name] ? (
+                                      <span
+                                        className={
+                                          chemicalDifference[name] > 0
+                                            ? "text-green-500"
+                                            : "text-red-500"
+                                        }
+                                      >
+                                        {chemicalDifference[name] > 0
+                                          ? "+"
+                                          : ""}
+                                        {chemicalDifference[name].toFixed(3)}%
+                                      </span>
+                                    ) : (
+                                      "-"
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              )
+                            )}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
             ))}
           </Tabs>
@@ -190,7 +372,15 @@ export function OptimizationResults({ results }: OptimizationResultsProps) {
               <Label htmlFor="comparison-group">比较指标组</Label>
               <Select
                 value={comparisonGroup}
-                onValueChange={handleComparisonGroupChange}
+                onValueChange={(value) =>
+                  setComparisonGroup(
+                    value as
+                      | "ratios"
+                      | "strength"
+                      | "majorChemical"
+                      | "minorChemical"
+                  )
+                }
               >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="选择比较指标组" />
@@ -203,23 +393,63 @@ export function OptimizationResults({ results }: OptimizationResultsProps) {
                 </SelectContent>
               </Select>
             </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="amplify-differences"
+                checked={amplifyDifferences}
+                onCheckedChange={setAmplifyDifferences}
+              />
+              <Label htmlFor="amplify-differences">放大差异</Label>
+            </div>
           </div>
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={prepareComparisonData()} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis dataKey="name" type="category" width={60} />
-              <Tooltip />
-              <Legend />
-              {results.map((_, index) => (
-                <Bar
-                  key={index}
-                  dataKey={`方案${index + 1}`}
-                  fill={COLORS[index]}
-                />
-              ))}
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart data={prepareComparisonData()} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis dataKey="name" type="category" width={60} />
+                  <Tooltip
+                    formatter={(value, name, props) => {
+                      const originalValue =
+                        props.payload[`原始值${String(name).slice(-1)}`];
+                      return [`${originalValue.toFixed(3)}`, name];
+                    }}
+                  />
+                  <Legend />
+                  {results.map((_, index) => (
+                    <Bar
+                      key={index}
+                      dataKey={`方案${index + 1}`}
+                      fill={COLORS[index]}
+                    />
+                  ))}
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>指标</TableHead>
+                    <TableHead>方案1</TableHead>
+                    <TableHead>方案2</TableHead>
+                    <TableHead>方案3</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {prepareComparisonData().map((row) => (
+                    <TableRow key={row.name}>
+                      <TableCell>{row.name}</TableCell>
+                      <TableCell>{row["原始值1"].toFixed(3)}</TableCell>
+                      <TableCell>{row["原始值2"].toFixed(3)}</TableCell>
+                      <TableCell>{row["原始值3"].toFixed(3)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

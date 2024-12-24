@@ -690,6 +690,9 @@ body{
 .mt-8{
   margin-top: 2rem;
 }
+.mt-6{
+  margin-top: 1.5rem;
+}
 .block{
   display: block;
 }
@@ -928,6 +931,9 @@ body{
 }
 .gap-8{
   gap: 2rem;
+}
+.gap-9{
+  gap: 2.25rem;
 }
 .space-x-1 > :not([hidden]) ~ :not([hidden]){
   --tw-space-x-reverse: 0;

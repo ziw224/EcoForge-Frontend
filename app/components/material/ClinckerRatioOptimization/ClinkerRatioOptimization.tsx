@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ParameterInput } from "../StrengthPrediction/ParameterInput";
+import { ParameterInput } from "./ParameterInput";
 import { OptimizationResults } from "./OptimizationResults";
 import {
   AlertDialog,
@@ -41,13 +41,13 @@ export function ClinkerRatioOptimization({
     onStepChange(2, false);
 
     try {
-      // 模拟优化过程
+      // Simulate optimization process
       for (let i = 0; i <= 100; i += 10) {
         await new Promise((resolve) => setTimeout(resolve, 500));
         setProgress(i);
       }
 
-      // 模拟结果数据
+      // Simulate result data
       const optimizationResults: OptimizationResult[] = [
         {
           id: 1,
@@ -139,32 +139,34 @@ export function ClinkerRatioOptimization({
     setShowSaveDialog(false);
     onStepChange(3, true);
     onStepChange(4, false);
-    // 实际保存逻辑
+    // Add save logic here
   };
 
   return (
     <ErrorBoundary fallback={<div>出错了，请刷新页面重试。</div>}>
       <div className="space-y-6">
-        <ParameterInput excludeParameters={["KH", "N", "P"]} />
+        <ParameterInput onOptimizeStart={handleOptimize} />
 
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-4">
               <div className="space-x-4">
-                <Button
-                  onClick={handleOptimize}
-                  disabled={isOptimizing}
-                  size="lg"
-                  className={
-                    isOptimizing ? "bg-gray-500" : results ? "bg-green-500" : ""
-                  }
-                >
-                  {isOptimizing
-                    ? "正在优化..."
-                    : results
-                    ? "优化完成"
-                    : "开始优化"}
-                </Button>
+                {(isOptimizing || results) && (
+                  <Button
+                    onClick={handleOptimize}
+                    disabled={isOptimizing}
+                    size="lg"
+                    className={
+                      isOptimizing
+                        ? "bg-gray-500"
+                        : results
+                        ? "bg-green-500"
+                        : ""
+                    }
+                  >
+                    {isOptimizing ? "正在优化..." : results ? "优化完成" : ""}
+                  </Button>
+                )}
                 {isOptimizing && (
                   <Button
                     variant="outline"
