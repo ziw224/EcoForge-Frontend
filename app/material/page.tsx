@@ -8,6 +8,7 @@ import { ClinkerRatioOptimization } from "../components/material/ClinckerRatioOp
 import { RawMaterialOptimization } from "../components/material/RawMaterial/RawMaterialOptimization";
 import { CementMixOptimization } from "../components/material/CementMix/CementMixOptimization";
 import { StepNavigation } from "../components/material/StepNavigation";
+import { useUser } from "../context/userContext"; // Import your useUser hook
 
 const initialSteps = [
   {
@@ -43,6 +44,7 @@ const initialSteps = [
 export default function MaterialPage() {
   const [currentSteps, setCurrentSteps] = useState(initialSteps);
   const [activeStep, setActiveStep] = useState(1);
+  const { user } = useUser(); // Retrieve user details from the context
 
   const handleStepChange = (stepId: number) => {
     setActiveStep(stepId);
@@ -59,6 +61,10 @@ export default function MaterialPage() {
     setCurrentSteps(initialSteps);
     setActiveStep(1);
   };
+
+  if (!user) {
+    return <div>用户未登录，请先登录。</div>;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -99,6 +105,12 @@ export default function MaterialPage() {
                   <StrengthPrediction onStepChange={handleStepChange} />
                 </TabsContent>
                 <TabsContent value="clinker-ratio">
+                  {/* <ClinkerRatioOptimization
+                    uid={user.username} // Pass user ID
+                    companyId={user.companyId} // Pass company ID
+                    taskId="20020228" // Replace with actual task ID logic
+                    onStepChange={handleStepChange}
+                  /> */}
                   <ClinkerRatioOptimization onStepChange={handleStepChange} />
                 </TabsContent>
                 <TabsContent value="raw-material">

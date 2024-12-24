@@ -1,3 +1,159 @@
+// "use client";
+
+// import { useState, useEffect } from "react";
+// import { Card, CardContent } from "@/components/ui/card";
+// import { Button } from "@/components/ui/button";
+// import { Progress } from "@/components/ui/progress";
+// import { ParameterInput } from "./ParameterInput";
+// import { OptimizationResults } from "./OptimizationResults";
+// import {
+//   AlertDialog,
+//   AlertDialogAction,
+//   AlertDialogCancel,
+//   AlertDialogContent,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+// } from "@/components/ui/alert-dialog";
+// import ErrorBoundary from "../../common/ErrorBoundary";
+// import { pollProgress } from "../../../fetch/progressCheck";
+
+// interface ClinkerRatioOptimizationProps {
+//   uid: string;
+//   taskId: string;
+//   companyId: string;
+//   onStepChange: (stepId: number, completed: boolean) => void;
+// }
+
+// export function ClinkerRatioOptimization({
+//   uid,
+//   taskId,
+//   companyId,
+//   onStepChange,
+// }: ClinkerRatioOptimizationProps) {
+//   const [isOptimizing, setIsOptimizing] = useState(false);
+//   const [currentStage, setCurrentStage] = useState<string | null>(
+//     "准备优化..."
+//   );
+//   const [showSaveDialog, setShowSaveDialog] = useState(false);
+//   const [error, setError] = useState<string | null>(null);
+
+//   useEffect(() => {
+//     // console.log("useEffect triggered:");
+//     // console.log("UID:", uid);
+//     // console.log("Task ID:", taskId);
+//     // console.log("Company ID:", companyId);
+
+//     let stopPolling: (() => void) | undefined;
+
+//     if (isOptimizing) {
+//       stopPolling = pollProgress(
+//         uid,
+//         taskId,
+//         companyId,
+//         (data) => {
+//           console.log("Polling progress response:", data);
+//           setCurrentStage(data.data.desc || "进行中...");
+//           if (data.data.progress === 1) {
+//             // Stop polling when progress completes
+//             setIsOptimizing(false);
+//             onStepChange(2, true);
+//             onStepChange(3, false);
+//           }
+//         },
+//         (err) => {
+//           console.error("Polling error:", err);
+//           setError("优化过程中发生错误，请重试。");
+//           setIsOptimizing(false);
+//           onStepChange(2, false);
+//         }
+//       );
+//     }
+
+//     return () => {
+//       if (stopPolling) stopPolling();
+//     };
+//   }, [isOptimizing, uid, taskId, companyId, onStepChange]);
+
+//   const handleOptimize = () => {
+//     console.log("Starting optimization with:");
+//     console.log("UID:", uid);
+//     console.log("Task ID:", taskId);
+//     console.log("Company ID:", companyId);
+
+//     setIsOptimizing(true);
+//     setCurrentStage("准备优化...");
+//     setError(null);
+//     onStepChange(1, true);
+//     onStepChange(2, false);
+//   };
+
+//   const handleSave = () => {
+//     setShowSaveDialog(true);
+//   };
+
+//   const handleConfirmSave = () => {
+//     setShowSaveDialog(false);
+//     onStepChange(3, true);
+//     onStepChange(4, false);
+//     // Add save logic here
+//   };
+
+//   return (
+//     <ErrorBoundary fallback={<div>出错了，请刷新页面重试。</div>}>
+//       <div className="space-y-6">
+//         <ParameterInput
+//           uid={uid}
+//           taskId={taskId}
+//           companyId={companyId}
+//           onOptimizeStart={handleOptimize}
+//         />
+
+//         <Card>
+//           <CardContent className="pt-6">
+//             <div className="flex items-center justify-between mb-4">
+//               <div className="space-x-4">
+//                 {isOptimizing && (
+//                   <Button disabled size="lg" className="bg-gray-500">
+//                     正在优化...
+//                   </Button>
+//                 )}
+//               </div>
+//               {isOptimizing && (
+//                 <div className="text-gray-600 text-sm mt-2 text-center">
+//                   当前阶段：{currentStage}
+//                 </div>
+//               )}
+//             </div>
+//           </CardContent>
+//         </Card>
+
+//         {error && (
+//           <div className="text-red-500 bg-red-100 p-4 rounded-md">{error}</div>
+//         )}
+
+//         <AlertDialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+//           <AlertDialogContent>
+//             <AlertDialogHeader>
+//               <AlertDialogTitle>保存优化方案</AlertDialogTitle>
+//               <AlertDialogDescription>
+//                 是否确认保存当前优化方案？保存后可在数据库中查看和管理。
+//               </AlertDialogDescription>
+//             </AlertDialogHeader>
+//             <AlertDialogFooter>
+//               <AlertDialogCancel>取消</AlertDialogCancel>
+//               <AlertDialogAction onClick={handleConfirmSave}>
+//                 确认保存
+//               </AlertDialogAction>
+//             </AlertDialogFooter>
+//           </AlertDialogContent>
+//         </AlertDialog>
+//       </div>
+//     </ErrorBoundary>
+//   );
+// }
+
 "use client";
 
 import { useState } from "react";
