@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ParameterInput } from "./ParameterInput";
 import { OptimizationResults } from "./OptimizationResults";
 import { OptimizationResult } from "@/types/common";
+import { fetchOptimizationResults } from "../../../fetch/getResult";
 
 import {
   AlertDialog,
@@ -39,34 +40,91 @@ export function ClinkerRatioOptimization({
   const [currentStage, setCurrentStage] = useState<string | null>(
     "准备优化..."
   );
+  const [loadingResults, setLoadingResults] = useState(false); // New state for loading results
+
   // const [progress, setProgress] = useState(0);
   const [results, setResults] = useState<OptimizationResult[] | null>(null);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // console.log("useEffect triggered:");
-    // console.log("UID:", uid);
-    // console.log("Task ID:", taskId);
-    // console.log("Company ID:", companyId);
+  const isPollingRef = useRef(false); // Prevent multiple polling instances
 
-    let stopPolling: (() => void) | undefined;
+  const fetchResults = async () => {
+    try {
+      setLoadingResults(true);
+      const response = await fetchOptimizationResults(uid, taskId, companyId);
+      const data = response.data;
 
-    if (isOptimizing) {
-      stopPolling = pollProgress(
+      setResults([
+        {
+          id: 1, // default
+          KH: data.Default.ratios.KH,
+          N: data.Default.ratios.N,
+          P: data.Default.ratios.P,
+          strength: {
+            "1d": data.Default.strength_1d,
+            "3d": data.Default.strength_3d,
+            "28d": data.Default.strength_28d,
+          },
+          chemical: data.Default.chemical_props,
+        },
+        {
+          id: 2, // optimum
+          KH: data.optimum.ratios.KH,
+          N: data.optimum.ratios.N,
+          P: data.optimum.ratios.P,
+          strength: {
+            "1d": data.optimum.strength_1d,
+            "3d": data.optimum.strength_3d,
+            "28d": data.optimum.strength_28d,
+          },
+          chemical: data.optimum.chemical_props,
+        },
+        {
+          id: 3, // improvement
+          KH: data.improvement.ratios.KH,
+          N: data.improvement.ratios.N,
+          P: data.improvement.ratios.P,
+          strength: {
+            "1d": data.improvement.strength_1d,
+            "3d": data.improvement.strength_3d,
+            "28d": data.improvement.strength_28d,
+          },
+          chemical: data.improvement.chemical_props,
+        },
+      ]);
+      setLoadingResults(false);
+    } catch (err) {
+      console.error("Error fetching optimization results:", err);
+      setError("无法获取优化结果，请重试。");
+      setLoadingResults(false);
+    }
+  };
+
+  const handlePollProgress = async () => {
+    if (isPollingRef.current) return; // Prevent multiple polling instances
+    isPollingRef.current = true;
+
+    try {
+      await pollProgress(
         uid,
         taskId,
         companyId,
-        (data) => {
-          console.log("Polling progress response:", data);
+        async (data) => {
           setCurrentStage(
             `${data.data.desc || "进行中..."} (Progress: ${Math.floor(
               data.data.progress * 100
             )}%)`
           );
-          if (data.data.progress === 1) {
-            // Stop polling when progress completes
+
+          // Check if optimization is complete
+          if (
+            data.data.desc === "Stage 3: Finding lower KH ratios" &&
+            data.data.progress === 1
+          ) {
+            isPollingRef.current = false;
             setIsOptimizing(false);
+            await fetchResults(); // Fetch results after optimization completes
             onStepChange(2, true);
             onStepChange(3, false);
           }
@@ -75,107 +133,29 @@ export function ClinkerRatioOptimization({
           console.error("Polling error:", err);
           setError("优化过程中发生错误，请重试。");
           setIsOptimizing(false);
+          isPollingRef.current = false;
           onStepChange(2, false);
         }
       );
+    } catch (err) {
+      console.error("Unexpected error during polling:", err);
     }
+  };
 
-    return () => {
-      if (stopPolling) stopPolling();
-    };
-  }, [isOptimizing, uid, taskId, companyId, onStepChange]);
-
-  const handleOptimize = () => {
+  const handleOptimize = async () => {
     console.log("Starting optimization with:");
     console.log("UID:", uid);
     console.log("Task ID:", taskId);
     console.log("Company ID:", companyId);
 
+    setResults(null);
     setIsOptimizing(true);
     setCurrentStage("准备优化...");
     setError(null);
     onStepChange(1, true);
     onStepChange(2, false);
-    // Simulate optimization process
-    // for (let i = 0; i <= 100; i += 10) {
-    //   await new Promise((resolve) => setTimeout(resolve, 500));
-    //   setProgress(i);
-    // }
 
-    // Simulate result data
-    const optimizationResults: OptimizationResult[] = [
-      {
-        id: 1,
-        KH: 0.9222,
-        N: 2.35,
-        P: 1.45,
-        strength: {
-          "1d": 15.5,
-          "3d": 31.4,
-          "28d": 58.7,
-        },
-        chemical: {
-          "SiO₂": 22.12,
-          "Al₂O₃": 5.08,
-          "Fe₂O₃": 3.41,
-          "CaO": 64.59,
-          "MgO": 2.54,
-          "SO₃": 0.53,
-          "f-CaO": 0.99,
-          "Na₂O": 0.25,
-          "K₂O": 0.9,
-          "Cl⁻": 0.025,
-        },
-      },
-      {
-        id: 2,
-        KH: 0.9,
-        N: 2.4,
-        P: 1.5,
-        strength: {
-          "1d": 14.8,
-          "3d": 30.9,
-          "28d": 59.2,
-        },
-        chemical: {
-          "SiO₂": 21.98,
-          "Al₂O₃": 5.12,
-          "Fe₂O₃": 3.38,
-          "CaO": 64.21,
-          "MgO": 2.56,
-          "SO₃": 0.54,
-          "f-CaO": 0.97,
-          "Na₂O": 0.26,
-          "K₂O": 0.91,
-          "Cl⁻": 0.024,
-        },
-      },
-      {
-        id: 3,
-        KH: 0.94,
-        N: 2.3,
-        P: 1.4,
-        strength: {
-          "1d": 16.2,
-          "3d": 32.1,
-          "28d": 58.3,
-        },
-        chemical: {
-          "SiO₂": 22.26,
-          "Al₂O₃": 5.04,
-          "Fe₂O₃": 3.44,
-          "CaO": 64.97,
-          "MgO": 2.52,
-          "SO₃": 0.52,
-          "f-CaO": 1.01,
-          "Na₂O": 0.24,
-          "K₂O": 0.89,
-          "Cl⁻": 0.026,
-        },
-      },
-    ];
-
-    setResults(optimizationResults);
+    await handlePollProgress(); // Start polling and wait for completion
   };
 
   const handleSave = () => {
@@ -212,11 +192,7 @@ export function ClinkerRatioOptimization({
                       : ""
                   }`}
                 >
-                  {isOptimizing
-                    ? "正在优化..." 
-                    : results
-                    ? "优化完成" 
-                    : ""}
+                  {isOptimizing ? "正在优化..." : results ? "优化完成" : ""}
                 </div>
               </div>
 

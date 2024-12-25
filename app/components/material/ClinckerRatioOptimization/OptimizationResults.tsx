@@ -184,11 +184,15 @@ export function OptimizationResults({ results }: OptimizationResultsProps) {
             onValueChange={handleTabChange}
           >
             <TabsList className="grid w-full grid-cols-3">
-              {results.map((result) => (
-                <TabsTrigger key={result.id} value={result.id.toString()}>
-                  方案 {result.id}
-                </TabsTrigger>
-              ))}
+              <TabsTrigger key={1} value="1">
+                最优方案
+              </TabsTrigger>
+              <TabsTrigger key={2} value="2">
+                窑况最佳
+              </TabsTrigger>
+              <TabsTrigger key={3} value="3">
+                改善易烧性
+              </TabsTrigger>
             </TabsList>
             {results.map((result) => (
               <TabsContent key={result.id} value={result.id.toString()}>
@@ -432,9 +436,9 @@ export function OptimizationResults({ results }: OptimizationResultsProps) {
                 <TableHeader>
                   <TableRow>
                     <TableHead>指标</TableHead>
-                    <TableHead>方案1</TableHead>
-                    <TableHead>方案2</TableHead>
-                    <TableHead>方案3</TableHead>
+                    <TableHead>最优方案（方案1）</TableHead>
+                    <TableHead>窑况最佳（方案2）</TableHead>
+                    <TableHead>改善易烧性（方案3）</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

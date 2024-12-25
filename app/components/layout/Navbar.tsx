@@ -52,9 +52,9 @@ export function Navbar() {
             <span className="text-xl font-semibold text-white">EcoMatrix</span>
             <span className="ml-4 text-gray-400">
               /{" "}
-              {user?.companyId === "100001"
+              {user?.companyId === "100002"
                 ? "Factory_YZ"
-                : user?.companyId === "100002"
+                : user?.companyId === "100001"
                 ? "Factory_PY"
                 : "未选择公司"}
               /

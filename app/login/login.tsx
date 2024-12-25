@@ -40,8 +40,8 @@ export default function Login({ onClose, onLogin }: LoginProps) {
             onChange={(e) => setSelectedCompany(e.target.value)}
             className="w-full px-4 py-2 rounded bg-gray-700 text-white focus:outline-none"
           >
-            <option value="100001">Factory_YZ</option>
-            <option value="100002">Factory_PY</option>
+            <option value="100002">Factory_YZ</option>
+            <option value="100001">Factory_PY</option>
           </select>
         </div>
         <div className="flex items-center justify-between">

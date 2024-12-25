@@ -108,7 +108,7 @@ export default function MaterialPage() {
                   <ClinkerRatioOptimization
                     uid={user.username} // Pass user ID
                     companyId={user.companyId} // Pass company ID
-                    taskId="20020228" // Replace with actual task ID logic
+                    taskId="02282002" // Replace with actual task ID logic
                     onStepChange={handleStepChange}
                   />
                   {/* <ClinkerRatioOptimization onStepChange={handleStepChange} /> */}
