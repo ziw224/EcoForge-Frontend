@@ -102,9 +102,6 @@ export function ClinkerRatioOptimization({
   };
 
   const handlePollProgress = async () => {
-    if (isPollingRef.current) return; // Prevent multiple polling instances
-    isPollingRef.current = true;
-
     try {
       await pollProgress(
         uid,
@@ -116,15 +113,15 @@ export function ClinkerRatioOptimization({
               data.data.progress * 100
             )}%)`
           );
-
-          // Check if optimization is complete
+  
           if (
             data.data.desc === "Stage 3: Finding lower KH ratios" &&
             data.data.progress === 1
           ) {
-            isPollingRef.current = false;
             setIsOptimizing(false);
+            setLoadingResults(true);
             await fetchResults(); // Fetch results after optimization completes
+            setLoadingResults(false);
             onStepChange(2, true);
             onStepChange(3, false);
           }
@@ -133,15 +130,15 @@ export function ClinkerRatioOptimization({
           console.error("Polling error:", err);
           setError("优化过程中发生错误，请重试。");
           setIsOptimizing(false);
-          isPollingRef.current = false;
           onStepChange(2, false);
-        }
+        },
+        3000 // Increase polling interval to 3 seconds
       );
     } catch (err) {
       console.error("Unexpected error during polling:", err);
     }
   };
-
+  
   const handleOptimize = async () => {
     console.log("Starting optimization with:");
     console.log("UID:", uid);
