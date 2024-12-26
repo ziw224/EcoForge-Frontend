@@ -39,25 +39,22 @@ export function StrengthPrediction({ onStepChange }: StrengthPredictionProps) {
       setProgress(i);
     }
 
-    // 模拟结果数据
     setResults({
       strength: {
-        "1d": { value: 15.5, confidence: 0.5 },
-        "3d": { value: 31.4, confidence: 1.0 },
-        "28d": { value: 58.7, confidence: 1.5 },
+        "1d": { value: 15.09, confidence: 0.5 }, // Assuming confidence remains static
+        "3d": { value: 31.38, confidence: 1.0 },
+        "28d": { value: 54.73, confidence: 1.5 },
       },
       chemical: {
-        "SiO₂": 22.12,
-        "Al₂O₃": 5.08,
-        "Fe₂O₃": 3.41,
-        CaO: 64.59,
-        MgO: 2.54,
-        "SO₃": 0.53,
-        "f-CaO": 0.99,
-        "Na₂O": 0.25,
-        "K₂O": 0.9,
-        "R₂O": 0.84,
-        "Cl⁻": 0.025,
+        "SiO₂": 22.19, // Rounded from SiO2
+        "Al₂O₃": 5.26, // Rounded from Al2O3
+        "Fe₂O₃": 3.47, // Rounded from Fe2O3
+        CaO: 64.75,
+        MgO: 2.93,
+        "SO₃": 0.46, // Rounded from SO3
+        "f-CaO": 1.78, // Rounded from f-Ca0
+        "R₂O": 0.76, // Rounded from R2O
+        LOSS: 0.34,
       },
     });
 

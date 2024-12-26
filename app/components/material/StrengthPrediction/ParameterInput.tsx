@@ -33,14 +33,15 @@ const modelVersions = [
 const defaultStoragePath = "/data/predictions/cement-strength/";
 
 const coalParameters: LocalParameter[] = [
-  { id: "Wf", name: "内水", unit: "Wf", visible: true },
-  { id: "Minh", name: "外水", unit: "Minh", visible: true },
+  { id: "Wf", name: "全水", unit: "Wf", visible: true },
+  { id: "Minh", name: "内水", unit: "Minh", visible: true },
   { id: "Aad", name: "灰分", unit: "Aad", visible: true },
+  { id: "Vad", name: "挥发分", unit: "Vad", visible: true },
   { id: "FC", name: "固定碳", unit: "FC", visible: true },
   { id: "S", name: "硫含量", unit: "S", visible: true },
   { id: "GAR", name: "煤粉细度", unit: "GAR", visible: true },
   { id: "JG", name: "热值", unit: "J/G", visible: true },
-  { id: "Qgr", name: "热功率", unit: "Qgr", visible: true },
+  { id: "Qgr", name: "空干基发热量", unit: "Qgr", visible: true },
 ];
 
 const clinkerParameters: LocalParameter[] = [
