@@ -102,16 +102,21 @@ export default function MaterialPage() {
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="strength">
-                  <StrengthPrediction onStepChange={handleStepChange} />
+                  <StrengthPrediction
+                    uid={user.username}
+                    companyId={user.companyId} 
+                    taskId="123456789"
+                    onStepChange={handleStepChange}
+                  />
                 </TabsContent>
                 <TabsContent value="clinker-ratio">
-                  {/* <ClinkerRatioOptimization
-                    uid={user.username} // Pass user ID
-                    companyId={user.companyId} // Pass company ID
-                    taskId="02282002" // Replace with actual task ID logic
+                  <ClinkerRatioOptimization
+                    uid={user.username}
+                    companyId={user.companyId} 
+                    taskId="02282002"
                     onStepChange={handleStepChange}
-                  /> */}
-                  <ClinkerRatioOptimization onStepChange={handleStepChange} />
+                  />
+                  {/* <ClinkerRatioOptimization onStepChange={handleStepChange} /> */}
                 </TabsContent>
                 <TabsContent value="raw-material">
                   <RawMaterialOptimization />

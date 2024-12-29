@@ -24,6 +24,13 @@ type LocalParameter = {
 
 type ParameterCategory = "basic" | "coal" | "chemical" | "clinker";
 
+interface ParameterInputProps {
+  uid: string;
+  taskId: string;
+  companyId: string;
+  onOptimizeStart: () => Promise<void>;
+}
+
 const modelVersions = [
   { id: "v1.0", name: "Version 1.0 - 基础版" },
   { id: "v1.1", name: "Version 1.1 - 优化版" },
