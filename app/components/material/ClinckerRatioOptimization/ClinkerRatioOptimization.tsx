@@ -50,57 +50,79 @@ export function ClinkerRatioOptimization({
   const isPollingRef = useRef(false); // Prevent multiple polling instances
 
   const fetchResults = async () => {
-    try {
-      setLoadingResults(true);
-      const response = await fetchOptimizationResults(uid, taskId, companyId);
-      const data = response.data;
+    const MAX_RETRIES = 5; // Maximum number of retry attempts
+    const RETRY_DELAY = 3000; // Delay between retries in milliseconds
 
-      setResults([
-        {
-          id: 1, // default
-          KH: data.Default.ratios.KH,
-          N: data.Default.ratios.N,
-          P: data.Default.ratios.P,
-          strength: {
-            "1d": data.Default.strength_1d,
-            "3d": data.Default.strength_3d,
-            "28d": data.Default.strength_28d,
+    let attempts = 0;
+
+    setLoadingResults(true);
+    setError(null); // Clear any existing error
+
+    while (attempts < MAX_RETRIES) {
+      try {
+        const response = await fetchOptimizationResults(uid, taskId, companyId);
+        const data = response.data;
+
+        setResults([
+          {
+            id: 1, // default
+            KH: data.Default.ratios.KH,
+            N: data.Default.ratios.N,
+            P: data.Default.ratios.P,
+            strength: {
+              "1d": data.Default.strength_1d,
+              "3d": data.Default.strength_3d,
+              "28d": data.Default.strength_28d,
+            },
+            chemical: data.Default.chemical_props,
           },
-          chemical: data.Default.chemical_props,
-        },
-        {
-          id: 2, // optimum
-          KH: data.optimum.ratios.KH,
-          N: data.optimum.ratios.N,
-          P: data.optimum.ratios.P,
-          strength: {
-            "1d": data.optimum.strength_1d,
-            "3d": data.optimum.strength_3d,
-            "28d": data.optimum.strength_28d,
+          {
+            id: 2, // optimum
+            KH: data.optimum.ratios.KH,
+            N: data.optimum.ratios.N,
+            P: data.optimum.ratios.P,
+            strength: {
+              "1d": data.optimum.strength_1d,
+              "3d": data.optimum.strength_3d,
+              "28d": data.optimum.strength_28d,
+            },
+            chemical: data.optimum.chemical_props,
           },
-          chemical: data.optimum.chemical_props,
-        },
-        {
-          id: 3, // improvement
-          KH: data.improvement.ratios.KH,
-          N: data.improvement.ratios.N,
-          P: data.improvement.ratios.P,
-          strength: {
-            "1d": data.improvement.strength_1d,
-            "3d": data.improvement.strength_3d,
-            "28d": data.improvement.strength_28d,
+          {
+            id: 3, // improvement
+            KH: data.improvement.ratios.KH,
+            N: data.improvement.ratios.N,
+            P: data.improvement.ratios.P,
+            strength: {
+              "1d": data.improvement.strength_1d,
+              "3d": data.improvement.strength_3d,
+              "28d": data.improvement.strength_28d,
+            },
+            chemical: data.improvement.chemical_props,
           },
-          chemical: data.improvement.chemical_props,
-        },
-      ]);
-      setLoadingResults(false);
-    } catch (err) {
-      console.error("Error fetching optimization results:", err);
-      setError("无法获取优化结果，请重试。");
-      setLoadingResults(false);
+        ]);
+
+        setLoadingResults(false);
+        return; // Exit the loop on successful fetch
+      } catch (err) {
+        attempts += 1;
+        console.warn(
+          `Retry attempt ${attempts} failed. Retrying in ${
+            RETRY_DELAY / 1000
+          } seconds...`
+        );
+
+        if (attempts >= MAX_RETRIES) {
+          setError("无法获取优化结果，请重试。");
+          setLoadingResults(false);
+          return;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY)); // Wait before retrying
+      }
     }
   };
-
+  
   const handlePollProgress = async () => {
     try {
       await pollProgress(

@@ -236,15 +236,32 @@ export function ParameterInput({
           </CardHeader>
           <CardContent className="space-y-1">
             {parameters.coal.map((param) => renderParameter("coal", param))}
-            <Button
-              variant="outline"
-              className="w-full mt-4 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
-              onClick={() => {
-                setEditMode((prev) => ({ ...prev, coal: !prev.coal }));
-              }}
-            >
-              {editMode.coal ? "保存" : "编辑参数"}
-            </Button>
+            <div className="flex flex-col items-center space-y-2 mt-4">
+              <Button
+                variant="outline"
+                className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+                onClick={() =>
+                  setEditMode((prev) => ({ ...prev, coal: !prev.coal }))
+                }
+              >
+                {editMode.coal ? "保存" : "编辑参数"}
+              </Button>
+              <Button
+                onClick={() =>
+                  setParameters((prev) => ({
+                    ...prev,
+                    coal: coalParameters.map((param) => ({
+                      ...param,
+                      value: "", // Reset the value to empty
+                    })),
+                  }))
+                }
+                variant="outline"
+                className="w-full border-red-500 text-red-500 hover:bg-red-100"
+              >
+                一键清空
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
@@ -256,15 +273,32 @@ export function ParameterInput({
             {parameters.chemical.map((param) =>
               renderParameter("chemical", param)
             )}
-            <Button
-              variant="outline"
-              className="w-full mt-4 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
-              onClick={() => {
-                setEditMode((prev) => ({ ...prev, chemical: !prev.chemical }));
-              }}
-            >
-              {editMode.chemical ? "保存" : "编辑参数"}
-            </Button>
+            <div className="flex flex-col items-center space-y-2 mt-4">
+              <Button
+                variant="outline"
+                className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+                onClick={() =>
+                  setEditMode((prev) => ({ ...prev, chemical: !prev.chemical }))
+                }
+              >
+                {editMode.chemical ? "保存" : "编辑参数"}
+              </Button>
+              <Button
+                onClick={() =>
+                  setParameters((prev) => ({
+                    ...prev,
+                    chemical: chemicalParameters.map((param) => ({
+                      ...param,
+                      value: "", // Reset the value to empty
+                    })),
+                  }))
+                }
+                variant="outline"
+                className="w-full border-red-500 text-red-500 hover:bg-red-100"
+              >
+                一键清空
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -278,15 +312,32 @@ export function ParameterInput({
             {parameters.clinker.map((param) =>
               renderParameter("clinker", param)
             )}
-            <Button
-              variant="outline"
-              className="w-full mt-4 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
-              onClick={() => {
-                setEditMode((prev) => ({ ...prev, clinker: !prev.clinker }));
-              }}
-            >
-              {editMode.clinker ? "保存" : "编辑参数"}
-            </Button>
+            <div className="flex items-center justify-between mt-4 space-x-4">
+              <Button
+                variant="outline"
+                className="w-1/2 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+                onClick={() => {
+                  setEditMode((prev) => ({ ...prev, clinker: !prev.clinker }));
+                }}
+              >
+                {editMode.clinker ? "保存" : "编辑参数"}
+              </Button>
+              <Button
+                onClick={() =>
+                  setParameters((prev) => ({
+                    ...prev,
+                    clinker: prev.clinker.map((param) => ({
+                      ...param,
+                      value: "", // Reset each parameter's value to empty
+                    })),
+                  }))
+                }
+                variant="outline"
+                className="w-1/2 border-red-500 text-red-500 hover:bg-red-100"
+              >
+                一键清空
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}

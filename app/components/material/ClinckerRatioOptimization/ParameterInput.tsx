@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -57,76 +58,62 @@ export function ParameterInput({
   companyId,
   onOptimizeStart,
 }: ParameterInputProps) {
-  const [parameters, setParameters] = useState({
-    basic: {
-      date: new Date().toISOString().split("T")[0],
-      batchNumber: "",
-      operator: "",
-      modelVersion: "v2.0",
-      storagePath: defaultStoragePath,
-    },
-    coal: coalParameters,
-    chemical: chemicalParameters,
-  });
+  const initialParameters = () => {
+    const savedParameters = localStorage.getItem("parameters");
+    if (savedParameters) {
+      return JSON.parse(savedParameters);
+    }
+    return {
+      basic: {
+        date: new Date().toISOString().split("T")[0],
+        batchNumber: "",
+        operator: "",
+        modelVersion: "v2.0",
+        storagePath: defaultStoragePath,
+      },
+      coal: coalParameters,
+      chemical: chemicalParameters,
+    };
+  };
 
-  const [editMode, setEditMode] = useState<{
-    coal: boolean;
-    chemical: boolean;
-  }>({
+  const [parameters, setParameters] = useState(initialParameters);
+  const [editMode, setEditMode] = useState({
     coal: false,
     chemical: false,
   });
 
+  useEffect(() => {
+    localStorage.setItem("parameters", JSON.stringify(parameters));
+  }, [parameters]);
+
   const handleOptimizationStart = async () => {
     try {
-      // // Combine all parameters into a single flat object
-      // const rawMaterials = {
-      //   // ...parameters.basic, // Add basic parameters
-      //   ...Object.fromEntries(
-      //     parameters.coal
-      //       .filter((param) => param.visible)
-      //       .map(({ id, value }) => [id, value]) // Add visible coal parameters
-      //   ),
-      //   ...Object.fromEntries(
-      //     parameters.chemical
-      //       .filter((param) => param.visible)
-      //       .map(({ id, value }) => [id, value]) // Add visible chemical parameters
-      //   ),
-      // };
+      const formData = new FormData();
 
-      // Create FormData with the combined parameters
-      let formData = new FormData();
+      // // Append basic parameters
+      // Object.entries(parameters.basic).forEach(([key, value]) => {
+      //   formData.append(key, String(value));
+      // });
 
-      // Append each key-value pair for company YZ
-      // formData.append("I-LOSS", "35.94");
-      // formData.append("I-SiO2", "13.58");
-      // formData.append("I-Al2O3", "3.14");
-      // formData.append("I-Fe2O3", "2.1");
-      // formData.append("I-CaO", "42.6");
-      // formData.append("I-MgO", "1.44");
-      // formData.append("I-CL", "0.025");
-      // formData.append("I-R2O", "0.51");
-      // formData.append("I-SO3", "0.26");
-      // formData.append("Vad", "28.66");
-      // formData.append("Aad", "7.77");
-      // formData.append("Qgr", "5548");
-      // formData.append("S", "0.62");
+      // Append visible coal parameters
+      parameters.coal
+        .filter(
+          (param) =>
+            param.visible && param.value !== undefined && param.value !== ""
+        )
+        .forEach((param) => {
+          formData.append(param.id, String(param.value));
+        });
 
-      // Company PY
-      formData.append("Wf", String(10.0));
-      formData.append("Minh", String(2.22));
-      formData.append("Aad", String(17.77));
-      formData.append("Vad", String(28.66));
-      formData.append("S", String(0.62));
-      formData.append("GAR", String(5548.0));
-      formData.append("I-LOSS", String(35.94));
-      formData.append("I-SiO2", String(13.58));
-      formData.append("I-Al2O3", String(3.14));
-      formData.append("I-Fe2O3", String(2.1));
-      formData.append("I-CaO", String(42.6));
-      formData.append("I-MgO", String(1.44));
-      formData.append("I-R2O", String(0.51));
-      formData.append("I-CL", String(0.02));
+      // Append visible chemical parameters
+      parameters.chemical
+        .filter(
+          (param) =>
+            param.visible && param.value !== undefined && param.value !== ""
+        )
+        .forEach((param) => {
+          formData.append(param.id, String(param.value));
+        });
 
       // Print FormData for debugging
       console.log("FormData Contents:");
@@ -255,15 +242,32 @@ export function ParameterInput({
           </CardHeader>
           <CardContent className="space-y-1">
             {parameters.coal.map((param) => renderParameter("coal", param))}
-            <Button
-              variant="outline"
-              className="w-full mt-4 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
-              onClick={() => {
-                setEditMode((prev) => ({ ...prev, coal: !prev.coal }));
-              }}
-            >
-              {editMode.coal ? "保存" : "编辑参数"}
-            </Button>
+            <div className="flex flex-col items-center space-y-2 mt-4">
+              <Button
+                variant="outline"
+                className=" w-full border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+                onClick={() =>
+                  setEditMode((prev) => ({ ...prev, coal: !prev.coal }))
+                }
+              >
+                {editMode.coal ? "保存" : "编辑参数"}
+              </Button>
+              <Button
+                onClick={() =>
+                  setParameters((prev) => ({
+                    ...prev,
+                    coal: coalParameters.map((param) => ({
+                      ...param,
+                      value: "", // Reset the value to empty
+                    })),
+                  }))
+                }
+                variant="outline"
+                className="w-full border-red-500 text-red-500 hover:bg-red-100"
+              >
+                一键清空
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
@@ -275,15 +279,32 @@ export function ParameterInput({
             {parameters.chemical.map((param) =>
               renderParameter("chemical", param)
             )}
-            <Button
-              variant="outline"
-              className="w-full mt-4 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
-              onClick={() =>
-                setEditMode((prev) => ({ ...prev, chemical: !prev.chemical }))
-              }
-            >
-              {editMode.chemical ? "保存" : "编辑参数"}
-            </Button>
+            <div className="flex flex-col items-center space-y-2 mt-4">
+              <Button
+                variant="outline"
+                className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+                onClick={() =>
+                  setEditMode((prev) => ({ ...prev, chemical: !prev.chemical }))
+                }
+              >
+                {editMode.chemical ? "保存" : "编辑参数"}
+              </Button>
+              <Button
+                onClick={() =>
+                  setParameters((prev) => ({
+                    ...prev,
+                    chemical: chemicalParameters.map((param) => ({
+                      ...param,
+                      value: "", // Reset the value to empty
+                    })),
+                  }))
+                }
+                variant="outline"
+                className="w-full border-red-500 text-red-500 hover:bg-red-100"
+              >
+                一键清空
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

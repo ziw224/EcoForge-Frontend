@@ -1,4 +1,4 @@
-// File: /Users/zihanwang/Desktop/EcoForge-Frontend/app/material/page.tsx
+// File: /Users/wangzihan/Desktop/EcoForge-Frontend/app/material/page.tsx
 import * as entry from '../../../../app/material/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

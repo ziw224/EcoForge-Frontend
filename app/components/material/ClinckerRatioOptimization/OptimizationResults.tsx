@@ -436,9 +436,21 @@ export function OptimizationResults({ results }: OptimizationResultsProps) {
                 <TableHeader>
                   <TableRow>
                     <TableHead>指标</TableHead>
-                    <TableHead>最优方案（方案1）</TableHead>
-                    <TableHead>窑况最佳（方案2）</TableHead>
-                    <TableHead>改善易烧性（方案3）</TableHead>
+                    <TableHead>
+                      最优方案
+                      <br />
+                      (方案1)
+                    </TableHead>
+                    <TableHead>
+                      窑况最佳
+                      <br />
+                      (方案2)
+                    </TableHead>
+                    <TableHead>
+                      改善易烧性
+                      <br />
+                      (方案3)
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
