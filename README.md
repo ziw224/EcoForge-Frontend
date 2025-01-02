@@ -4,7 +4,10 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 First, 
 download the depencies:
-npm install
+
+```bash
+npm run dev
+```
 
 Then,
 run the development server:
