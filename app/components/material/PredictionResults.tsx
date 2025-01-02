@@ -52,24 +52,29 @@ export function PredictionResults({ results }: PredictionResultsProps) {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-3 gap-4 mb-6">
-            {Object.entries(results.strength).map(
-              ([day, { value, confidence }]) => (
+            {Object.entries(results.strength).map(([day, strengthData]) => {
+              const { value, confidence } = strengthData || {};
+              return (
                 <div
                   key={day}
                   className="text-center p-4 bg-gray-700 rounded-lg"
                 >
                   <div className="text-2xl font-bold text-white">
-                    {value.toFixed(2)} MPa
+                    {value !== undefined
+                      ? `${value.toFixed(2)} MPa`
+                      : "数据缺失"}
                   </div>
                   <div className="text-sm text-gray-300">
                     {day === "1d" ? "1天" : day === "3d" ? "3天" : "28天"}强度
                   </div>
                   <div className="text-xs text-gray-400">
-                    ±{confidence.toFixed(2)} MPa
+                    {confidence !== undefined
+                      ? `±${confidence.toFixed(2)} MPa`
+                      : "置信区间未知"}
                   </div>
                 </div>
-              )
-            )}
+              );
+            })}
           </div>
         </CardContent>
       </Card>

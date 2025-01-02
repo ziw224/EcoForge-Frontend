@@ -6,6 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { startOptimization } from "../../../fetch/startOptimization";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type LocalParameter = {
   id: string;
@@ -19,16 +26,22 @@ type ParameterCategory = "basic" | "coal" | "chemical";
 
 const defaultStoragePath = "/data/predictions/cement-strength/";
 
+const modelVersions = [
+  { id: "v1.0", name: "Version 1.0 - 基础版" },
+  { id: "v1.1", name: "Version 1.1 - 优化版" },
+  { id: "v2.0", name: "Version 2.0 - 高级版" },
+];
+
 const coalParameters: LocalParameter[] = [
-  { id: "Wf", name: "内水", unit: "Wf", visible: true },
-  { id: "Minh", name: "外水", unit: "Minh", visible: true },
+  { id: "Wf", name: "全水", unit: "Wf", visible: true },
+  { id: "Minh", name: "内水", unit: "Minh", visible: true },
   { id: "Aad", name: "灰分", unit: "Aad", visible: true },
   { id: "Vad", name: "挥发分", unit: "Vad", visible: true },
   { id: "FC", name: "固定碳", unit: "FC", visible: true },
   { id: "S", name: "硫含量", unit: "S", visible: true },
-  { id: "GAR", name: "煤粉细度", unit: "GAR", visible: true },
-  { id: "JG", name: "热值", unit: "J/G", visible: true },
-  { id: "Qgr", name: "热功率", unit: "Qgr", visible: true },
+  { id: "GAR", name: "热值", unit: "GAR", visible: true },
+  { id: "JG", name: "J/G", unit: "J/G", visible: true },
+  { id: "Qgr", name: "空干基发热量", unit: "Qgr", visible: true },
 ];
 
 const chemicalParameters: LocalParameter[] = [
@@ -45,6 +58,7 @@ const chemicalParameters: LocalParameter[] = [
   { id: "I-CL", name: "氯离子", unit: "I-CL", visible: true },
 ];
 
+
 interface ParameterInputProps {
   uid: string;
   taskId: string;
@@ -59,7 +73,7 @@ export function ParameterInput({
   onOptimizeStart,
 }: ParameterInputProps) {
   const initialParameters = () => {
-    const savedParameters = localStorage.getItem("parameters");
+    const savedParameters = localStorage.getItem("optimization_parameters");
     if (savedParameters) {
       return JSON.parse(savedParameters);
     }
@@ -83,7 +97,7 @@ export function ParameterInput({
   });
 
   useEffect(() => {
-    localStorage.setItem("parameters", JSON.stringify(parameters));
+    localStorage.setItem("optimization_parameters", JSON.stringify(parameters));
   }, [parameters]);
 
   const handleOptimizationStart = async () => {
@@ -115,11 +129,11 @@ export function ParameterInput({
           formData.append(param.id, String(param.value));
         });
 
-      // Print FormData for debugging
-      console.log("FormData Contents:");
-      Array.from(formData.entries()).forEach(([key, value]) => {
-        console.log(`${key}: ${value}`);
-      });
+      // // Print FormData for debugging
+      // console.log("FormData Contents:");
+      // Array.from(formData.entries()).forEach(([key, value]) => {
+      //   console.log(`${key}: ${value}`);
+      // });
 
       // Send data to API
       const response = await startOptimization(
@@ -197,43 +211,75 @@ export function ParameterInput({
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>基本生产信息</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>日期</Label>
-              <Input
-                type="date"
-                value={parameters.basic.date}
-                onChange={(e) =>
-                  handleParameterChange("basic", "date", e.target.value)
-                }
-              />
+        <Card>
+          <CardHeader>
+            <CardTitle>基本生产信息</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>日期</Label>
+                <Input
+                  type="date"
+                  value={parameters.basic.date}
+                  onChange={(e) =>
+                    handleParameterChange("basic", "date", e.target.value)
+                  }
+                />
+              </div>
+              <div>
+                <Label>编号</Label>
+                <Input
+                  value={parameters.basic.batchNumber}
+                  onChange={(e) =>
+                    handleParameterChange(
+                      "basic",
+                      "batchNumber",
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+              <div>
+                <Label>操作员</Label>
+                <Input
+                  value={parameters.basic.operator}
+                  onChange={(e) =>
+                    handleParameterChange("basic", "operator", e.target.value)
+                  }
+                />
+              </div>
+              <div>
+                <Label>模型版本</Label>
+                <Select
+                  value={parameters.basic.modelVersion}
+                  onValueChange={(value) =>
+                    handleParameterChange("basic", "modelVersion", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择模型版本" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {modelVersions.map((version) => (
+                      <SelectItem key={version.id} value={version.id}>
+                        {version.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div>
-              <Label>编号</Label>
+              <Label>储存地址</Label>
               <Input
-                value={parameters.basic.batchNumber}
-                onChange={(e) =>
-                  handleParameterChange("basic", "batchNumber", e.target.value)
-                }
+                value={parameters.basic.storagePath}
+                disabled
+                className="bg-gray-50"
               />
             </div>
-            <div>
-              <Label>操作员</Label>
-              <Input
-                value={parameters.basic.operator}
-                onChange={(e) =>
-                  handleParameterChange("basic", "operator", e.target.value)
-                }
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
